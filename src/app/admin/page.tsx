@@ -8,7 +8,7 @@ export default function AdminPage() {
     <div className="flex items-center justify-center min-h-[80vh] bg-secondary/50">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Admin Dashboard</CardTitle>
+          <CardTitle className="text-2xl">Login Dashboard</CardTitle>
           <CardDescription>Please sign in to continue</CardDescription>
         </CardHeader>
         <CardContent>
