@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "@/hooks/use-auth"
@@ -65,16 +65,10 @@ export function Header() {
                   <span className="sr-only">Toggle Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="flex flex-col p-0">
-                  <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
-                     <Logo />
-                     <SheetClose asChild>
-                        <Button variant="ghost" size="icon">
-                          <X className="h-6 w-6" />
-                          <span className="sr-only">Close Menu</span>
-                        </Button>
-                     </SheetClose>
-                     <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <SheetContent side="right" className="flex flex-col p-0">
+                 <SheetHeader className="p-4 border-b">
+                    <Logo />
+                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                   </SheetHeader>
                 <nav className="flex flex-col items-start gap-4 p-4">
                   {navLinks.map((link) => (
@@ -104,19 +98,17 @@ export function Header() {
         </div>
 
         {/* === Desktop View === */}
-        <div className="hidden w-full items-center md:grid md:grid-cols-3">
-          {/* Left side: Logo */}
-          <div className="flex justify-start">
+        <div className="hidden w-full items-center justify-between md:flex">
+          {/* Left side: Logo + Nav */}
+          <div className="flex items-center gap-6 lg:gap-10">
             <Logo />
+            <nav className="hidden items-center gap-4 md:flex lg:gap-6">
+              {navLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+            </nav>
           </div>
-
-          {/* Center: Nav */}
-          <nav className="hidden items-center justify-center gap-4 md:flex lg:gap-6">
-            {navLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-          </nav>
-
+          
           {/* Right Side: Buttons */}
           <div className="flex items-center justify-end gap-2">
             <ThemeToggle />
