@@ -31,7 +31,7 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-16">
             <div className="flex flex-col justify-center space-y-6">
               <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl xl:text-7xl/none text-primary">
-                Innovate. Build. Empower.
+                Innovating the Next. Empowering the Now.
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
                 Codezcube delivers cutting-edge Web Development, Mobile Development, AI/ML, and EdTech solutions to transform your ideas into reality.
