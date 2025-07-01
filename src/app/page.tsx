@@ -128,7 +128,7 @@ export default function Home() {
             <p className="max-w-[800px] text-primary-foreground/80 md:text-xl">
               Let's discuss how Codezcube can help you achieve your goals with our innovative tech solutions. Schedule a free consultation today!
             </p>
-            <Button asChild size="lg" variant="outline" className="mt-4 border-primary-foreground/80 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button asChild size="lg" variant="outline" className="mt-4 bg-transparent border-white/80 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Link href="/booking">Book a Free Consultation</Link>
             </Button>
           </div>
