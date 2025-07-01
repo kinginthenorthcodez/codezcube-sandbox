@@ -51,85 +51,90 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Logo />
-        </div>
-        <div className="flex items-center md:hidden">
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="pr-0">
-              <div className="flex items-center justify-between p-4 border-b">
-                 <Logo />
-                 <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                    <X className="h-6 w-6" />
-                    <span className="sr-only">Close Menu</span>
+      <div className="container relative flex h-16 items-center justify-between">
+        {/* Left Side: Logo (Desktop) & Menu (Mobile) */}
+        <div className="flex items-center">
+          <div className="hidden md:flex">
+            <Logo />
+          </div>
+          <div className="md:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle Menu</span>
                 </Button>
-              </div>
-              <nav className="flex flex-col items-start gap-6 p-4">
-                {navLinks.map((link) => (
-                  <NavLink key={link.href} {...link} />
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
-        <div className="flex flex-1 items-center justify-between space-x-6 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <div className="flex justify-center md:hidden">
-              <Logo />
-            </div>
-            <nav className="hidden items-center gap-6 md:flex">
-              {navLinks.map((link) => (
-                <NavLink key={link.href} {...link} />
-              ))}
-            </nav>
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                       <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
-                    </Avatar>
+              </SheetTrigger>
+              <SheetContent side="left" className="pr-0">
+                <div className="flex items-center justify-between p-4 border-b">
+                   <Logo />
+                   <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                      <X className="h-6 w-6" />
+                      <span className="sr-only">Close Menu</span>
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">My Account</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin/dashboard">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button asChild>
-                <Link href="/admin">Login</Link>
-              </Button>
-            )}
+                </div>
+                <nav className="flex flex-col items-start gap-6 p-4">
+                  {navLinks.map((link) => (
+                    <NavLink key={link.href} {...link} />
+                  ))}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
+        </div>
+
+        {/* Center: Nav (Desktop) & Logo (Mobile) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex md:hidden">
+            <Logo />
+          </div>
+          <nav className="hidden items-center gap-6 md:flex">
+            {navLinks.map((link) => (
+              <NavLink key={link.href} {...link} />
+            ))}
+          </nav>
+        </div>
+
+        {/* Right Side: Buttons */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                     <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">My Account</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button asChild>
+              <Link href="/admin">Login</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
