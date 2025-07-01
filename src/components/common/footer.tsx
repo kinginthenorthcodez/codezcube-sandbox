@@ -8,7 +8,7 @@ export function Footer() {
     <footer className="border-t">
       <div className="container py-12">
         <div className="grid gap-8 md:grid-cols-12">
-          <div className="flex flex-col gap-4 md:col-span-4">
+          <div className="flex flex-col items-center gap-4 text-center md:col-span-4 md:items-start md:text-left">
             <Logo />
             <p className="text-sm text-muted-foreground">
               Innovating the Next. Empowering the Now.
@@ -31,7 +31,7 @@ export function Footer() {
               </Button>
             </div>
           </div>
-          <div className="grid gap-8 md:col-span-8 md:grid-cols-3">
+          <div className="grid grid-cols-2 gap-8 text-center md:col-span-8 md:grid-cols-3 md:text-left">
             <div>
               <h4 className="font-medium text-sm mb-2">Quicklinks</h4>
               <ul className="space-y-2">
@@ -49,7 +49,7 @@ export function Footer() {
                 <li><Link href="/pricing" className="text-sm text-muted-foreground hover:text-primary">Pricing</Link></li>
               </ul>
             </div>
-             <div>
+             <div className="col-span-2 md:col-span-1">
               <h4 className="font-medium text-sm mb-2">Legal</h4>
               <ul className="space-y-2">
                 <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
