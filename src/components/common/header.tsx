@@ -51,13 +51,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container relative flex h-16 items-center justify-between">
-        {/* Left Side: Logo (Desktop) & Menu (Mobile) */}
-        <div className="flex items-center">
-          <div className="hidden lg:flex">
+      <div className="container grid h-16 grid-cols-3 items-center">
+        {/* Left Side */}
+        <div className="flex items-center justify-start">
+          <div className="hidden md:flex">
             <Logo />
           </div>
-          <div className="lg:hidden">
+          <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -66,17 +66,15 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="pr-0">
-                <div className="flex items-center justify-between p-4 border-b">
+                <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
                    <Logo />
+                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                    <SheetClose asChild>
                       <Button variant="ghost" size="icon">
                         <X className="h-6 w-6" />
                         <span className="sr-only">Close Menu</span>
                       </Button>
                    </SheetClose>
-                </div>
-                <SheetHeader className="sr-only">
-                  <SheetTitle>Navigation Menu</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col items-start gap-6 p-4">
                   {navLinks.map((link) => (
@@ -89,11 +87,11 @@ export function Header() {
         </div>
 
         {/* Center: Nav (Desktop) & Logo (Mobile) */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex lg:hidden">
+        <div className="flex justify-center">
+          <div className="flex md:hidden">
             <Logo />
           </div>
-          <nav className="hidden items-center gap-6 lg:flex">
+          <nav className="hidden items-center gap-4 md:flex lg:gap-6">
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
@@ -101,7 +99,7 @@ export function Header() {
         </div>
 
         {/* Right Side: Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           <ThemeToggle />
           {user ? (
             <DropdownMenu>
