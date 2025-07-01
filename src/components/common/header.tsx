@@ -98,7 +98,7 @@ export function Header() {
         </div>
 
         {/* === Desktop View === */}
-        <div className="hidden w-full items-center justify-between md:flex">
+        <div className="hidden w-full items-center justify-evenly md:flex">
           {/* Left side: Logo + Nav */}
           <div className="flex items-center gap-6 lg:gap-10">
             <Logo />

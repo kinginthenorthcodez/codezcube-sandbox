@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -26,10 +27,10 @@ const stats = [
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="py-24 sm:py-32 md:py-40">
+      <section className="py-16 sm:py-20 md:py-24">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:gap-16">
-            <div className="flex flex-col justify-center space-y-6">
+            <div className="flex flex-col justify-center space-y-2">
               <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl xl:text-7xl/none text-primary">
                 Innovate. Build. Empower.
               </h1>
@@ -128,7 +129,7 @@ export default function Home() {
             <p className="max-w-[800px] text-primary-foreground/80 md:text-xl">
               Let's discuss how Codezcube can help you achieve your goals with our innovative tech solutions. Schedule a free consultation today!
             </p>
-            <Button asChild size="lg" variant="outline" className="mt-4 bg-transparent border-white/80 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button asChild size="lg" variant="outline" className="mt-4 bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Link href="/booking">Book a Free Consultation</Link>
             </Button>
           </div>
