@@ -11,7 +11,7 @@ export function Footer() {
           <div className="flex flex-col gap-4 md:col-span-4">
             <Logo />
             <p className="text-sm text-muted-foreground">
-              Innovating the future, one line of code at a time.
+              Innovating the Next. Empowering the Now.
             </p>
             <div className="flex gap-2">
               <Button variant="ghost" size="icon" asChild>
