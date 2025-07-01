@@ -5,6 +5,7 @@ import {
   onAuthStateChanged, 
   User, 
   signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   GithubAuthProvider,
@@ -16,6 +17,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, pass: string) => Promise<void>;
+  signUp: (email: string, pass: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithGitHub: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -46,6 +48,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     await signInWithEmailAndPassword(auth, email, pass);
   };
+
+  const signUp = async (email: string, pass: string) => {
+    if (!auth) {
+      throw new Error("Firebase is not configured.");
+    }
+    await createUserWithEmailAndPassword(auth, email, pass);
+  };
   
   const signInWithGoogle = async () => {
     if (!auth) {
@@ -69,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const value = { user, loading, signIn, signInWithGoogle, signInWithGitHub, signOut };
+  const value = { user, loading, signIn, signUp, signInWithGoogle, signInWithGitHub, signOut };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

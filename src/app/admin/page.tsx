@@ -13,11 +13,22 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Github } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const formSchema = z.object({
+const signInSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(1, { message: "Password is required." }),
 });
+
+const signUpSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+});
+
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -27,16 +38,25 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function AdminPage() {
-  const { signIn, signInWithGoogle, signInWithGitHub, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithGitHub, user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const [loadingProvider, setLoadingProvider] = useState<null | 'email' | 'google' | 'github'>(null);
+  const [loadingProvider, setLoadingProvider] = useState<null | 'email-signin' | 'email-signup' | 'google' | 'github'>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const signInForm = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",
+    },
+  });
+
+  const signUpForm = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -46,8 +66,8 @@ export default function AdminPage() {
     }
   }, [user, router]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoadingProvider('email');
+  async function onSignInSubmit(values: z.infer<typeof signInSchema>) {
+    setLoadingProvider('email-signin');
     try {
       await signIn(values.email, values.password);
       router.push("/admin/dashboard");
@@ -61,6 +81,23 @@ export default function AdminPage() {
       setLoadingProvider(null);
     }
   }
+  
+  async function onSignUpSubmit(values: z.infer<typeof signUpSchema>) {
+    setLoadingProvider('email-signup');
+    try {
+      await signUp(values.email, values.password);
+      router.push("/admin/dashboard");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: error.message || "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setLoadingProvider(null);
+    }
+  }
+
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     setLoadingProvider(provider);
@@ -88,44 +125,101 @@ export default function AdminPage() {
     <div className="flex items-center justify-center min-h-[80vh] bg-secondary/50">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Login Dashboard</CardTitle>
-          <CardDescription>Please sign in to continue</CardDescription>
+          <CardTitle className="text-2xl">Access Your Account</CardTitle>
+          <CardDescription>Sign in or create an account to continue</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label htmlFor="email">Email</Label>
-                    <FormControl>
-                      <Input id="email" type="email" placeholder="admin@codezcube.com" {...field} disabled={isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label htmlFor="password">Password</Label>
-                    <FormControl>
-                      <Input id="password" type="password" {...field} disabled={isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {loadingProvider === 'email' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
-              </Button>
-            </form>
-          </Form>
+          <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+              <TabsContent value="signin">
+                <Form {...signInForm}>
+                  <form onSubmit={signInForm.handleSubmit(onSignInSubmit)} className="space-y-4 pt-4">
+                    <FormField
+                      control={signInForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="email-signin">Email</Label>
+                          <FormControl>
+                            <Input id="email-signin" type="email" placeholder="admin@codezcube.com" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={signInForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="password-signin">Password</Label>
+                          <FormControl>
+                            <Input id="password-signin" type="password" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {loadingProvider === 'email-signin' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Sign In
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
+              <TabsContent value="signup">
+                <Form {...signUpForm}>
+                  <form onSubmit={signUpForm.handleSubmit(onSignUpSubmit)} className="space-y-4 pt-4">
+                    <FormField
+                      control={signUpForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="email-signup">Email</Label>
+                          <FormControl>
+                            <Input id="email-signup" type="email" placeholder="user@example.com" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={signUpForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="password-signup">Password</Label>
+                          <FormControl>
+                            <Input id="password-signup" type="password" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={signUpForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="confirmPassword">Confirm Password</Label>
+                          <FormControl>
+                            <Input id="confirmPassword" type="password" {...field} disabled={isLoading} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {loadingProvider === 'email-signup' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Create Account
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
+            </Tabs>
            <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
