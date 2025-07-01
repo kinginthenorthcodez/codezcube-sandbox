@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet"
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "@/hooks/use-auth"
@@ -68,11 +68,16 @@ export function Header() {
               <SheetContent side="left" className="pr-0">
                 <div className="flex items-center justify-between p-4 border-b">
                    <Logo />
-                   <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                      <X className="h-6 w-6" />
-                      <span className="sr-only">Close Menu</span>
-                  </Button>
+                   <SheetClose asChild>
+                      <Button variant="ghost" size="icon">
+                        <X className="h-6 w-6" />
+                        <span className="sr-only">Close Menu</span>
+                      </Button>
+                   </SheetClose>
                 </div>
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Navigation Menu</SheetTitle>
+                </SheetHeader>
                 <nav className="flex flex-col items-start gap-6 p-4">
                   {navLinks.map((link) => (
                     <NavLink key={link.href} {...link} />
