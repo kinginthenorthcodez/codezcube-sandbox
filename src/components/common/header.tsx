@@ -56,49 +56,51 @@ export function Header() {
         {/* === Mobile View === */}
         <div className="flex w-full items-center justify-between md:hidden">
           <Logo />
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="flex flex-col p-0">
-                <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
-                   <Logo />
-                   <SheetClose asChild>
-                      <Button variant="ghost" size="icon">
-                        <X className="h-6 w-6" />
-                        <span className="sr-only">Close Menu</span>
-                      </Button>
-                   </SheetClose>
-                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                </SheetHeader>
-              <nav className="flex flex-col items-start gap-4 p-4">
-                {navLinks.map((link) => (
-                  <NavLink key={link.href} {...link} isMobile />
-                ))}
-              </nav>
-              {/* Actions in mobile menu footer */}
-              <div className="mt-auto flex flex-col gap-4 border-t p-4">
-                {user ? (
-                   <>
-                    <div className="flex items-center gap-2 rounded-md border p-2">
-                        <Avatar>
-                            <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium truncate">{user.email}</span>
-                    </div>
-                    <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin/dashboard">Dashboard</Link></Button>
-                    <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
-                   </>
-                ) : (
-                    <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin">Login</Link></Button>
-                )}
-                <ThemeToggle />
-              </div>
-            </SheetContent>
-          </Sheet>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="flex flex-col p-0">
+                  <SheetHeader className="p-4 border-b flex flex-row items-center justify-between">
+                     <Logo />
+                     <SheetClose asChild>
+                        <Button variant="ghost" size="icon">
+                          <X className="h-6 w-6" />
+                          <span className="sr-only">Close Menu</span>
+                        </Button>
+                     </SheetClose>
+                     <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  </SheetHeader>
+                <nav className="flex flex-col items-start gap-4 p-4">
+                  {navLinks.map((link) => (
+                    <NavLink key={link.href} {...link} isMobile />
+                  ))}
+                </nav>
+                {/* Actions in mobile menu footer */}
+                <div className="mt-auto flex flex-col gap-4 border-t p-4">
+                  {user ? (
+                     <>
+                      <div className="flex items-center gap-2 rounded-md border p-2">
+                          <Avatar>
+                              <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium truncate">{user.email}</span>
+                      </div>
+                      <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin/dashboard">Dashboard</Link></Button>
+                      <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
+                     </>
+                  ) : (
+                      <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin">Login</Link></Button>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
 
         {/* === Desktop View === */}
