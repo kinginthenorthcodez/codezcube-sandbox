@@ -1,175 +1,93 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Code, Cpu, School, Users, Star } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Briefcase, Zap, BarChartBig, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
 
-const services = [
+const stats = [
   {
-    icon: <Code className="w-8 h-8 text-primary" />,
-    title: 'Web & Mobile Development',
-    description: 'Crafting bespoke, high-performance web and mobile applications that drive business growth.',
+    icon: <Briefcase className="w-8 h-8 text-primary" />,
+    value: '50+',
+    label: 'Projects Completed',
   },
   {
-    icon: <Cpu className="w-8 h-8 text-primary" />,
-    title: 'AI/ML Solutions',
-    description: 'Leveraging artificial intelligence and machine learning to build intelligent systems and unlock data-driven insights.',
+    icon: <Zap className="w-8 h-8 text-primary" />,
+    value: '98%',
+    label: 'Client Satisfaction',
   },
   {
-    icon: <School className="w-8 h-8 text-primary" />,
-    title: 'EdTech Products',
-    description: 'Developing innovative educational technology to transform learning experiences in Africa and beyond.',
-  },
-  {
-    icon: <Users className="w-8 h-8 text-primary" />,
-    title: 'IT Staffing & Consultation',
-    description: 'Connecting businesses with top-tier tech talent and providing expert IT strategy consulting.',
+    icon: <BarChartBig className="w-8 h-8 text-primary" />,
+    value: '5+',
+    label: 'Years of Experience',
   },
 ];
-
-const portfolio = [
-  {
-    title: "SME E-commerce Platform",
-    category: "Web Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "online store"
-  },
-  {
-    title: "AI-Powered Learning Assistant",
-    category: "AI/ML",
-    image: "https://placehold.co/600x400.png",
-    hint: "robot chatbot"
-  },
-  {
-    title: "National NGO Digital Portal",
-    category: "Web Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "community website"
-  },
-    {
-    title: "Mobile App for Farmers",
-    category: "Mobile Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "agriculture app"
-  },
-]
 
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="bg-secondary/50 py-24 sm:py-32 md:py-40">
+      <section className="py-24 sm:py-32 md:py-40">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-16">
-            <div className="flex flex-col justify-center space-y-4">
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                Building the Future of Tech in Africa
+            <div className="flex flex-col justify-center space-y-6">
+              <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl xl:text-7xl/none text-primary">
+                Innovate. Build. Empower.
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                CodezCube is your partner in innovation, offering cutting-edge web services, AI solutions, and educational programs to empower businesses and talent across the continent.
+                Codezcube delivers cutting-edge Web Development, Mobile Development, AI/ML, and EdTech solutions to transform your ideas into reality.
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
                 <Button asChild size="lg">
-                  <Link href="/services">Our Services</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/contact">Contact Us</Link>
+                  <Link href="/services">Discover Our Services</Link>
                 </Button>
               </div>
             </div>
-             <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center">
               <Image
-                src="https://placehold.co/600x400.png"
+                src="https://placehold.co/600x500.png"
                 width={600}
-                height={400}
+                height={500}
                 alt="Hero Image"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center"
-                data-ai-hint="technology team"
+                className="mx-auto aspect-square overflow-hidden rounded-xl object-cover object-center"
+                data-ai-hint="developer holding phone"
               />
             </div>
           </div>
         </div>
       </section>
 
-      <section id="services" className="py-16 md:py-24">
+      <section id="offerings" className="py-16 md:py-24 bg-secondary">
         <div className="container">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our Core Services</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our Core Offerings</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              We provide a comprehensive suite of technology services designed to elevate your business.
+              We provide a comprehensive suite of technology services designed to elevate your business, from initial concept to final deployment.
             </p>
-          </div>
-          <div className="mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
-            {services.map((service) => (
-              <Card key={service.title} className="flex flex-col text-center items-center p-6 hover:shadow-lg transition-shadow duration-300">
-                <div className="mb-4">{service.icon}</div>
-                <CardHeader className="p-0">
-                  <CardTitle className="text-lg">{service.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 mt-2">
-                  <CardDescription>{service.description}</CardDescription>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
 
-      <section id="portfolio" className="py-16 md:py-24 bg-secondary/50">
+      <section id="clients" className="py-16 md:py-24">
         <div className="container">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our Portfolio</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Clients we are proud of</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Discover a selection of our successful projects and case studies.
+              We've had the privilege of working with some of the most innovative companies and visionary startups to bring their ideas to life.
             </p>
           </div>
-          <div className="relative mt-12">
-            <Carousel opts={{ align: "start", loop: true }} className="w-full">
-              <CarouselContent>
-                {portfolio.map((item, index) => (
-                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                    <div className="p-1">
-                      <Card className="overflow-hidden">
-                        <CardContent className="p-0">
-                          <Image
-                            src={item.image}
-                            alt={item.title}
-                            width={600}
-                            height={400}
-                            className="w-full h-48 object-cover"
-                            data-ai-hint={item.hint}
-                          />
-                          <div className="p-4">
-                            <Badge variant="secondary" className="mb-2">{item.category}</Badge>
-                            <h3 className="text-lg font-semibold">{item.title}</h3>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 fill-black" />
-              <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 fill-black" />
-            </Carousel>
-          </div>
-           <div className="text-center mt-12">
-             <Button asChild variant="outline">
-              <Link href="/portfolio">View All Projects <ArrowRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
+          <div className="mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            {stats.map((stat) => (
+              <div key={stat.label} className="flex flex-col text-center items-center p-6">
+                <div className="mb-4">{stat.icon}</div>
+                <p className="text-4xl font-bold text-primary">{stat.value}</p>
+                <p className="text-muted-foreground mt-2">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
       
-      <section id="testimonials" className="py-16 md:py-24">
+      <section id="testimonials" className="py-16 md:py-24 bg-secondary">
         <div className="container">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">What Our Clients Say</h2>
@@ -177,15 +95,15 @@ export default function Home() {
           <div className="mt-12 max-w-3xl mx-auto">
             <Card>
               <CardContent className="p-8">
-                <div className="flex gap-1 mb-4">
-                    <Star className="text-accent fill-accent" />
-                    <Star className="text-accent fill-accent" />
-                    <Star className="text-accent fill-accent" />
-                    <Star className="text-accent fill-accent" />
-                    <Star className="text-accent fill-accent" />
+                <div className="flex gap-1 mb-4 text-primary">
+                    <Star className="fill-current" />
+                    <Star className="fill-current" />
+                    <Star className="fill-current" />
+                    <Star className="fill-current" />
+                    <Star className="fill-current" />
                 </div>
                 <blockquote className="text-lg italic text-muted-foreground">
-                  "Working with CodezCube was a game-changer for our organization. Their team is not only technically proficient but also deeply committed to our success. They delivered beyond our expectations."
+                  "Working with Codezcube was a game-changer for our organization. Their team is not only technically proficient but also deeply committed to our success. They delivered beyond our expectations."
                 </blockquote>
                 <div className="flex items-center gap-4 mt-6">
                   <Avatar>
@@ -206,11 +124,11 @@ export default function Home() {
       <section id="cta" className="py-16 md:py-24 bg-primary text-primary-foreground">
         <div className="container">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Ready to Start Your Project?</h2>
-            <p className="max-w-[600px] text-primary-foreground/80 md:text-xl">
-              Let's build something amazing together. Book a free consultation to discuss your ideas.
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Ready to Elevate Your Business?</h2>
+            <p className="max-w-[800px] text-primary-foreground/80 md:text-xl">
+              Let's discuss how Codezcube can help you achieve your goals with our innovative tech solutions. Schedule a free consultation today!
             </p>
-            <Button asChild size="lg" variant="secondary" className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button asChild size="lg" variant="secondary" className="bg-accent text-accent-foreground hover:bg-accent/90 mt-4">
               <Link href="/booking">Book a Free Consultation</Link>
             </Button>
           </div>

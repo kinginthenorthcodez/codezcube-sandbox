@@ -11,7 +11,7 @@ export function Footer() {
           <div className="flex flex-col gap-4 md:col-span-4">
             <Logo />
             <p className="text-sm text-muted-foreground">
-              Empowering African innovation through technology, education, and collaboration.
+              Innovating the future, one line of code at a time.
             </p>
             <div className="flex gap-2">
               <Button variant="ghost" size="icon" asChild>
@@ -33,21 +33,20 @@ export function Footer() {
           </div>
           <div className="grid gap-8 md:col-span-8 md:grid-cols-3">
             <div>
-              <h4 className="font-medium text-sm mb-2">Services</h4>
+              <h4 className="font-medium text-sm mb-2">Quicklinks</h4>
               <ul className="space-y-2">
-                <li><Link href="/services" className="text-sm text-muted-foreground hover:text-primary">Web Development</Link></li>
-                <li><Link href="/services" className="text-sm text-muted-foreground hover:text-primary">AI/ML Solutions</Link></li>
-                <li><Link href="/services" className="text-sm text-muted-foreground hover:text-primary">EdTech Products</Link></li>
-                <li><Link href="/services" className="text-sm text-muted-foreground hover:text-primary">IT Staffing</Link></li>
+                <li><Link href="/services" className="text-sm text-muted-foreground hover:text-primary">Services</Link></li>
+                <li><Link href="/portfolio" className="text-sm text-muted-foreground hover:text-primary">Case Studies</Link></li>
+                <li><Link href="/blog" className="text-sm text-muted-foreground hover:text-primary">Blog</Link></li>
+                <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-sm mb-2">Company</h4>
+              <h4 className="font-medium text-sm mb-2">Product/Solutions</h4>
               <ul className="space-y-2">
-                <li><Link href="/portfolio" className="text-sm text-muted-foreground hover:text-primary">Portfolio</Link></li>
-                <li><Link href="/courses" className="text-sm text-muted-foreground hover:text-primary">Courses</Link></li>
-                <li><Link href="/blog" className="text-sm text-muted-foreground hover:text-primary">Blog</Link></li>
-                <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact Us</Link></li>
+                <li><Link href="/products" className="text-sm text-muted-foreground hover:text-primary">Products</Link></li>
+                <li><Link href="/courses" className="text-sm text-muted-foreground hover:text-primary">Courses & Career</Link></li>
+                <li><Link href="/pricing" className="text-sm text-muted-foreground hover:text-primary">Pricing</Link></li>
               </ul>
             </div>
              <div>
@@ -60,7 +59,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} CodezCube. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Codezcube. All rights reserved.</p>
         </div>
       </div>
     </footer>

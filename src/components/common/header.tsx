@@ -13,10 +13,12 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { href: "/services", label: "Services" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/courses", label: "Courses" },
+  { href: "/portfolio", label: "Case Studies" },
+  { href: "/products", label: "Products" },
+  { href: "/courses", label: "Courses & Career" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/blog", label: "Blog" },
-  { href: "/contact", label: "Contact" },
+  { href: "/contact", label: "Contact Us" },
 ]
 
 export function Header() {
@@ -68,6 +70,9 @@ export function Header() {
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
+            <div className="flex justify-center md:hidden">
+              <Logo />
+            </div>
             <nav className="hidden items-center gap-6 md:flex">
               {navLinks.map((link) => (
                 <NavLink key={link.href} {...link} />
@@ -76,8 +81,8 @@ export function Header() {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button asChild className="hidden sm:inline-flex">
-              <Link href="/booking">Book a Consultation</Link>
+            <Button asChild>
+              <Link href="/admin">Login</Link>
             </Button>
           </div>
         </div>
