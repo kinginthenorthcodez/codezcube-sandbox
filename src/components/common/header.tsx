@@ -54,10 +54,10 @@ export function Header() {
       <div className="container relative flex h-16 items-center justify-between">
         {/* Left Side: Logo (Desktop) & Menu (Mobile) */}
         <div className="flex items-center">
-          <div className="hidden md:flex">
+          <div className="hidden lg:flex">
             <Logo />
           </div>
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -90,10 +90,10 @@ export function Header() {
 
         {/* Center: Nav (Desktop) & Logo (Mobile) */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex md:hidden">
+          <div className="flex lg:hidden">
             <Logo />
           </div>
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-6 lg:flex">
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}

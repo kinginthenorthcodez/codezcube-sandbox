@@ -28,7 +28,7 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="py-24 sm:py-32 md:py-40">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-2 lg:gap-16">
+          <div className="grid gap-6 md:grid-cols-2 lg:gap-16">
             <div className="flex flex-col justify-center space-y-6">
               <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl xl:text-7xl/none text-primary">
                 Innovate. Build. Empower.

@@ -48,7 +48,7 @@ export default function ServicesPage() {
       {/* Hero Section */}
       <section className="py-16 md:py-24 bg-secondary/50">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-16 items-center">
+          <div className="grid gap-8 md:grid-cols-2 lg:gap-16 items-center">
             <div className="flex flex-col justify-center space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl text-primary">
                 Our Expert Services
