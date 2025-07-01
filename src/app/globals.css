@@ -5,47 +5,47 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 224 71% 4%;
+    --foreground: 232 48% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
+    --card-foreground: 232 48% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
-    --primary: 197 78% 52%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 197 88% 96%;
-    --secondary-foreground: 197 78% 22%;
+    --popover-foreground: 232 48% 11%;
+    --primary: 24 92% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 232 48% 11%;
     --muted: 220 14% 91%;
     --muted-foreground: 225 8% 44%;
-    --accent: 46 100% 70%;
-    --accent-foreground: 46 100% 20%;
+    --accent: 24 92% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 197 78% 52%;
+    --ring: 24 92% 55%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 232 48% 11%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    --card: 232 48% 11%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 232 48% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 197 78% 52%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%;
+    --primary: 24 92% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 232 48% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 46 100% 70%;
-    --accent-foreground: 46 100% 20%;
+    --muted: 232 48% 15%;
+    --muted-foreground: 228 33% 75%;
+    --accent: 24 92% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 197 78% 52%;
+    --border: 232 48% 20%;
+    --input: 232 48% 20%;
+    --ring: 24 92% 55%;
   }
 }
 
