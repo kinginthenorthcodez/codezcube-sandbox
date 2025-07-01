@@ -5,3 +5,31 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+# You can specify environment variables for your backend. These are not
+# available on the client unless you specify them with a NEXT_PUBLIC_ prefix.
+#
+# To deploy with environment variables, you can run:
+# `firebase apphosting:backends:update BACKEND_ID --update-environment-variables=KEY1=VALUE1,KEY2=VALUE2`
+#
+# To learn more about managing environment variables, see
+# https://firebase.google.com/docs/app-hosting/configure#environment-variables
+#
+# Example (replace with your actual backend ID):
+# `firebase apphosting:backends:update my-backend --update-environment-variables=NEXT_PUBLIC_FIREBASE_API_KEY=your_key`
+#
+# IMPORTANT: For this project, you need to set the following environment variables
+# in the Firebase console or via the CLI for your app to work correctly when deployed:
+# - NEXT_PUBLIC_FIREBASE_API_KEY
+# - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+# - NEXT_PUBLIC_FIREBASE_PROJECT_ID
+# - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+# - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+# - NEXT_PUBLIC_FIREBASE_APP_ID
+environmentVariables:
+  NEXT_PUBLIC_FIREBASE_API_KEY: "your_api_key"
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "your_auth_domain"
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: "your_project_id"
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "your_storage_bucket"
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "your_sender_id"
+  NEXT_PUBLIC_FIREBASE_APP_ID: "your_app_id"
