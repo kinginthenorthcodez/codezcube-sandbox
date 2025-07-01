@@ -104,18 +104,16 @@ export function Header() {
         </div>
 
         {/* === Desktop View === */}
-        <div className="hidden w-full grid-cols-3 items-center md:grid">
-          {/* Left Side */}
-          <div className="flex items-center justify-start">
+        <div className="hidden w-full items-center justify-between md:flex">
+          {/* Left side: Logo and Nav */}
+          <div className="flex items-center gap-8">
             <Logo />
+            <nav className="flex items-center gap-4 lg:gap-6">
+              {navLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+            </nav>
           </div>
-
-          {/* Center: Nav */}
-          <nav className="flex items-center justify-center gap-4 lg:gap-6">
-            {navLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-          </nav>
 
           {/* Right Side: Buttons */}
           <div className="flex items-center justify-end gap-2">
