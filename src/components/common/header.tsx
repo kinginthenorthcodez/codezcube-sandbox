@@ -79,7 +79,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+        <div className="flex flex-1 items-center justify-between space-x-6 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <div className="flex justify-center md:hidden">
               <Logo />
