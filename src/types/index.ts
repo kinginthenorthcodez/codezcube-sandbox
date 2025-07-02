@@ -18,9 +18,19 @@ export type Service = {
 };
 
 export type Client = {
-  id: string;
+  id:string;
   name: string;
   logoUrl: string;
   logoStoragePath: string;
   dataAiHint: string;
+};
+
+export type Testimonial = {
+    id: string;
+    quote: string;
+    authorName: string;
+    authorTitle: string;
+    avatarUrl: string;
+    avatarStoragePath: string;
+    rating: number;
 };

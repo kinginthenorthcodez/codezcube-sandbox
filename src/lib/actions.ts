@@ -4,7 +4,7 @@ import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updat
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial } from '@/types';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -315,4 +315,119 @@ export async function deleteClient(id: string): Promise<{ success: boolean; mess
         console.error('Error deleting client:', error);
         return { success: false, message: 'Failed to delete client.' };
     }
+}
+
+const defaultTestimonials: Omit<Testimonial, 'id'>[] = [
+  {
+    quote: "Working with Codezcube was a game-changer for our organization. Their team is not only technically proficient but also deeply committed to our success. They delivered beyond our expectations.",
+    authorName: "Jane Doe",
+    authorTitle: "CEO, Acme Inc.",
+    avatarUrl: "https://github.com/shadcn.png",
+    avatarStoragePath: "",
+    rating: 5,
+  },
+];
+
+export async function getTestimonials(): Promise<Testimonial[]> {
+  if (!db) {
+    return defaultTestimonials.map((t, i) => ({ ...t, id: `default-${i}` }));
+  }
+  try {
+    const testimonialsCol = collection(db, 'testimonials');
+    const q = query(testimonialsCol, orderBy('authorName'));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      console.log('No testimonials found, seeding with default data.');
+      for (const testimonial of defaultTestimonials) {
+        await addDoc(collection(db, 'testimonials'), testimonial);
+      }
+      const seededSnapshot = await getDocs(q);
+      return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+    }
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+  } catch (error) {
+    console.error('Error fetching testimonials:', error);
+    return defaultTestimonials.map((t, i) => ({ ...t, id: `default-${i}` }));
+  }
+}
+
+export async function addTestimonial(formData: FormData): Promise<{ success: boolean; message: string }> {
+  if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
+
+  const avatarFile = formData.get('avatarFile') as File;
+  if (!avatarFile || avatarFile.size === 0) {
+    return { success: false, message: 'Author avatar is required.' };
+  }
+
+  try {
+    const { url, storagePath } = await handleFileUpload(avatarFile, 'testimonial-avatars');
+    const newTestimonial: Omit<Testimonial, 'id'> = {
+      quote: formData.get('quote') as string,
+      authorName: formData.get('authorName') as string,
+      authorTitle: formData.get('authorTitle') as string,
+      rating: Number(formData.get('rating')),
+      avatarUrl: url,
+      avatarStoragePath: storagePath,
+    };
+
+    await addDoc(collection(db, 'testimonials'), newTestimonial);
+    revalidatePath('/');
+    revalidatePath('/admin/dashboard');
+    return { success: true, message: 'Testimonial added successfully.' };
+  } catch (error) {
+    console.error('Error adding testimonial:', error);
+    return { success: false, message: 'Failed to add testimonial.' };
+  }
+}
+
+export async function updateTestimonial(id: string, formData: FormData): Promise<{ success: boolean; message: string }> {
+  if (!db) return { success: false, message: 'Firebase is not initialized.' };
+
+  try {
+    const docRef = doc(db, 'testimonials', id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return { success: false, message: 'Testimonial not found.' };
+
+    const existingTestimonial = docSnap.data() as Testimonial;
+    const testimonialUpdate: Partial<Testimonial> = {
+      quote: formData.get('quote') as string,
+      authorName: formData.get('authorName') as string,
+      authorTitle: formData.get('authorTitle') as string,
+      rating: Number(formData.get('rating')),
+    };
+
+    const avatarFile = formData.get('avatarFile') as File;
+    if (avatarFile && avatarFile.size > 0) {
+      await handleDeleteFile(existingTestimonial.avatarStoragePath);
+      const { url, storagePath } = await handleFileUpload(avatarFile, 'testimonial-avatars');
+      testimonialUpdate.avatarUrl = url;
+      testimonialUpdate.avatarStoragePath = storagePath;
+    }
+
+    await updateDoc(docRef, testimonialUpdate);
+    revalidatePath('/');
+    revalidatePath('/admin/dashboard');
+    return { success: true, message: 'Testimonial updated successfully.' };
+  } catch (error) {
+    console.error('Error updating testimonial:', error);
+    return { success: false, message: 'Failed to update testimonial.' };
+  }
+}
+
+export async function deleteTestimonial(id: string): Promise<{ success: boolean; message: string }> {
+  if (!db) return { success: false, message: 'Firebase is not initialized.' };
+  try {
+    const docRef = doc(db, 'testimonials', id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      await handleDeleteFile(docSnap.data().avatarStoragePath);
+    }
+    await deleteDoc(docRef);
+    revalidatePath('/');
+    revalidatePath('/admin/dashboard');
+    return { success: true, message: 'Testimonial deleted successfully.' };
+  } catch (error) {
+    console.error('Error deleting testimonial:', error);
+    return { success: false, message: 'Failed to delete testimonial.' };
+  }
 }

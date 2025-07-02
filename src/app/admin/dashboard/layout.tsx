@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from '@/components/ui/sidebar';
-import { Settings, Home, Blocks, Users, LayoutDashboard } from 'lucide-react';
+import { Settings, Home, Blocks, Users, LayoutDashboard, MessageSquareQuote } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -41,6 +41,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <SidebarMenuButton href="#clients" tooltip={{children: "Clients"}}>
                   <Users />
                   Clients
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton href="#testimonials" tooltip={{children: "Testimonials"}}>
+                  <MessageSquareQuote />
+                  Testimonials
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

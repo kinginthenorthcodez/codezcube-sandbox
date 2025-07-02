@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Briefcase, Zap, BarChartBig, Star, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getHomepageStats, getServices, getClients } from '@/lib/actions';
+import { getHomepageStats, getServices, getClients, getTestimonials } from '@/lib/actions';
 import * as icons from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default async function Home() {
   const statsData = await getHomepageStats();
   const servicesData = await getServices();
   const clientsData = await getClients();
+  const testimonialsData = await getTestimonials();
 
   const stats = [
     {
@@ -147,35 +149,58 @@ export default async function Home() {
       
       <section id="testimonials" className="py-16 md:py-24 bg-secondary">
         <div className="container">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">What Our Clients Say</h2>
+             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              Hear from our partners about their experience working with us.
+            </p>
           </div>
-          <div className="mt-12 max-w-3xl mx-auto">
-            <Card>
-              <CardContent className="p-8">
-                <div className="flex gap-1 mb-4 text-primary">
-                    <Star className="fill-current" />
-                    <Star className="fill-current" />
-                    <Star className="fill-current" />
-                    <Star className="fill-current" />
-                    <Star className="fill-current" />
-                </div>
-                <blockquote className="text-lg italic text-muted-foreground">
-                  "Working with Codezcube was a game-changer for our organization. Their team is not only technically proficient but also deeply committed to our success. They delivered beyond our expectations."
-                </blockquote>
-                <div className="flex items-center gap-4 mt-6">
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold">Jane Doe</p>
-                    <p className="text-sm text-muted-foreground">CEO, Acme Inc.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {testimonialsData.length > 0 ? (
+             <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full max-w-3xl mx-auto"
+            >
+              <CarouselContent>
+                {testimonialsData.map((testimonial) => (
+                  <CarouselItem key={testimonial.id}>
+                    <div className="p-1">
+                      <Card>
+                        <CardContent className="p-8 flex flex-col justify-between h-full">
+                          <div>
+                            <div className="flex gap-1 mb-4 text-primary">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star key={i} className={i < testimonial.rating ? 'fill-current' : 'fill-current text-muted-foreground/30'} />
+                              ))}
+                            </div>
+                            <blockquote className="text-lg italic text-muted-foreground mb-6">
+                              "{testimonial.quote}"
+                            </blockquote>
+                          </div>
+                          <div className="flex items-center gap-4 mt-auto">
+                            <Avatar>
+                              <AvatarImage src={testimonial.avatarUrl} alt={testimonial.authorName} />
+                              <AvatarFallback>{testimonial.authorName.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold">{testimonial.authorName}</p>
+                              <p className="text-sm text-muted-foreground">{testimonial.authorTitle}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          ) : (
+             <p className="text-center text-muted-foreground mt-8">No testimonials yet. Check back soon!</p>
+          )}
         </div>
       </section>
 

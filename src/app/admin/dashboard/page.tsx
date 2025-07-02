@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { HomepageStatsForm } from "./homepage-stats-form";
 import { ServicesManager } from "./offerings-manager";
 import { ClientsManager } from "./clients-manager";
+import { TestimonialsManager } from "./testimonials-manager";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -44,6 +45,9 @@ export default function DashboardPage() {
       </div>
       <div id="clients">
         <ClientsManager />
+      </div>
+      <div id="testimonials">
+        <TestimonialsManager />
       </div>
     </div>
   );
