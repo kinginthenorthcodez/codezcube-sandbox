@@ -39,16 +39,20 @@ function ClientFormDialog({
 
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
-    defaultValues: client
-      ? { name: client.name, logoUrl: client.logoUrl, dataAiHint: client.dataAiHint }
-      : { name: "", logoUrl: "", dataAiHint: "" },
+    defaultValues: {
+      name: client?.name || "",
+      logoUrl: client?.logoUrl || "",
+      dataAiHint: client?.dataAiHint || "",
+    },
   });
 
   React.useEffect(() => {
     if (isOpen) {
-      form.reset(client
-        ? { name: client.name, logoUrl: client.logoUrl, dataAiHint: client.dataAiHint }
-        : { name: "", logoUrl: "", dataAiHint: "" });
+      form.reset({
+        name: client?.name || "",
+        logoUrl: client?.logoUrl || "",
+        dataAiHint: client?.dataAiHint || "",
+      });
     }
   }, [client, form, isOpen]);
 
