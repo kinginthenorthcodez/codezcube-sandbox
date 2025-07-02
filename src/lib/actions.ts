@@ -416,7 +416,6 @@ export async function getHomepageContent(): Promise<HomepageContent> {
           cta: { ...defaultContent.cta, ...data.cta },
       };
     } else {
-      await setDoc(docRef, defaultContent);
       return defaultContent;
     }
   } catch (error) {
@@ -464,7 +463,6 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
       const data = docSnap.data();
       return { socialLinks: { ...defaultSiteConfig.socialLinks, ...data.socialLinks } };
     } else {
-      await setDoc(docRef, defaultSiteConfig);
       return defaultSiteConfig;
     }
   } catch (error) {
