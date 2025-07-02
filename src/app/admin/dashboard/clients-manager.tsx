@@ -7,7 +7,7 @@ import * as z from "zod";
 import { getClients, addClient, updateClient, deleteClient } from "@/lib/actions";
 import { type Client } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription as FormDesc } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -16,10 +16,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Image from "next/image";
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/svg+xml"];
+
 const clientSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
-  logoUrl: z.string().url("Please enter a valid URL for the logo."),
   dataAiHint: z.string().min(2, "AI hint must be at least 2 characters.").max(40, "Hint is too long."),
+  logoFile: z.any()
+    .optional()
+    .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
+    .refine((files) => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), "Only .jpg, .jpeg, .png, .svg and .webp formats are supported."),
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -41,8 +47,8 @@ function ClientFormDialog({
     resolver: zodResolver(clientSchema),
     defaultValues: {
       name: client?.name || "",
-      logoUrl: client?.logoUrl || "",
       dataAiHint: client?.dataAiHint || "",
+      logoFile: undefined,
     },
   });
 
@@ -50,22 +56,31 @@ function ClientFormDialog({
     if (isOpen) {
       form.reset({
         name: client?.name || "",
-        logoUrl: client?.logoUrl || "",
         dataAiHint: client?.dataAiHint || "",
+        logoFile: undefined,
       });
     }
   }, [client, form, isOpen]);
 
   const handleSubmit = async (data: ClientFormData) => {
     setIsSubmitting(true);
-    const clientData: Omit<Client, 'id'> = {
-        ...data,
-        logoStoragePath: client?.logoStoragePath || ""
-    };
+    
+    if (!client && (!data.logoFile || data.logoFile.length === 0)) {
+        form.setError("logoFile", { message: "A logo image is required." });
+        setIsSubmitting(false);
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('dataAiHint', data.dataAiHint);
+    if (data.logoFile && data.logoFile[0]) {
+      formData.append('logoFile', data.logoFile[0]);
+    }
 
     const action = client
-      ? updateClient(client.id, clientData)
-      : addClient(clientData);
+      ? updateClient(client.id, formData)
+      : addClient(formData);
 
     const result = await action;
     if (result.success) {
@@ -100,23 +115,41 @@ function ClientFormDialog({
             />
             <FormField
               control={form.control}
-              name="logoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Logo URL</FormLabel>
-                  <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="dataAiHint"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Image AI Hint</FormLabel>
                   <FormControl><Input placeholder="e.g. company logo" {...field} /></FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="logoFile"
+              render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Logo Image</FormLabel>
+                    {client?.logoUrl && (
+                        <div className="mb-2">
+                             <Image 
+                                src={client.logoUrl} 
+                                alt={client.name} 
+                                width={100} 
+                                height={40} 
+                                className="object-contain border rounded-md p-2"
+                            />
+                        </div>
+                    )}
+                    <FormControl>
+                        <Input
+                            type="file"
+                            accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                            onChange={(e) => field.onChange(e.target.files)}
+                        />
+                    </FormControl>
+                    <FormDesc>{client ? "Upload a new logo to replace the current one." : "Logo image for the client."}</FormDesc>
+                    <FormMessage />
                 </FormItem>
               )}
             />
@@ -218,7 +251,7 @@ export function ClientsManager() {
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
                                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>This will permanently delete the client.</AlertDialogDescription>
+                                            <AlertDialogDescription>This will permanently delete the client and its logo.</AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -13,6 +13,7 @@ export type Service = {
   features: string[];
   iconName: string;
   imageUrl: string;
+  imageStoragePath: string;
   order: number;
 };
 
