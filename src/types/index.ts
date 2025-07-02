@@ -34,3 +34,22 @@ export type Testimonial = {
     avatarStoragePath: string;
     rating: number;
 };
+
+export type HeroContent = {
+  headline: string;
+  subtext: string;
+  ctaText: string;
+  ctaLink: string;
+};
+
+export type CtaContent = {
+  headline: string;
+  subtext: string;
+  ctaText: string;
+  ctaLink: string;
+};
+
+export type HomepageContent = {
+  hero: HeroContent;
+  cta: CtaContent;
+};

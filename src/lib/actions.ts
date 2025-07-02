@@ -4,7 +4,7 @@ import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updat
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client, type Testimonial } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent } from '@/types';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -429,5 +429,64 @@ export async function deleteTestimonial(id: string): Promise<{ success: boolean;
   } catch (error) {
     console.error('Error deleting testimonial:', error);
     return { success: false, message: 'Failed to delete testimonial.' };
+  }
+}
+
+export async function getHomepageContent(): Promise<HomepageContent> {
+  const defaultContent: HomepageContent = {
+    hero: {
+      headline: 'Innovate. Build. Empower.',
+      subtext: 'Codezcube delivers cutting-edge Web Development, Mobile Development, AI/ML, and EdTech solutions to transform your ideas into reality.',
+      ctaText: 'Discover Our Services',
+      ctaLink: '/services',
+    },
+    cta: {
+      headline: 'Ready to Elevate Your Business?',
+      subtext: "Let's discuss how Codezcube can help you achieve your goals with our innovative tech solutions. Schedule a free consultation today!",
+      ctaText: 'Book a Free Consultation',
+      ctaLink: '/booking',
+    }
+  };
+
+  if (!db) {
+    console.warn('Firestore is not initialized. Serving default content.');
+    return defaultContent;
+  }
+
+  try {
+    const docRef = doc(db, 'homepage', 'content');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      // Deep merge with defaults to handle cases where new fields were added
+      return {
+          hero: { ...defaultContent.hero, ...data.hero },
+          cta: { ...defaultContent.cta, ...data.cta },
+      };
+    } else {
+      await setDoc(docRef, defaultContent);
+      return defaultContent;
+    }
+  } catch (error) {
+    console.error('Error fetching homepage content from Firestore.', error);
+    return defaultContent;
+  }
+}
+
+export async function updateHomepageContent(content: HomepageContent): Promise<{ success: boolean; message: string }> {
+  if (!db) {
+    return { success: false, message: 'Firebase is not initialized.' };
+  }
+  try {
+    const docRef = doc(db, 'homepage', 'content');
+    await setDoc(docRef, content, { merge: true });
+    revalidatePath('/');
+    revalidatePath('/admin/dashboard');
+    return { success: true, message: 'Homepage content updated successfully.' };
+  } catch (error) {
+    console.error('Error updating content:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return { success: false, message: `Failed to update content: ${errorMessage}` };
   }
 }

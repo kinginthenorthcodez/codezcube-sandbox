@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from '@/components/ui/sidebar';
-import { Settings, Home, Blocks, Users, LayoutDashboard, MessageSquareQuote } from 'lucide-react';
+import { Settings, Home, Blocks, Users, LayoutDashboard, MessageSquareQuote, LayoutTemplate } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -23,6 +23,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <SidebarMenuButton href="#info" tooltip={{children: "Welcome"}}>
                   <Home />
                   Welcome
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton href="#content" tooltip={{children: "Homepage Content"}}>
+                  <LayoutTemplate />
+                  Homepage Content
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Briefcase, Zap, BarChartBig, Star, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getHomepageStats, getServices, getClients, getTestimonials } from '@/lib/actions';
+import { getHomepageStats, getServices, getClients, getTestimonials, getHomepageContent } from '@/lib/actions';
 import * as icons from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
@@ -14,6 +14,7 @@ export default async function Home() {
   const servicesData = await getServices();
   const clientsData = await getClients();
   const testimonialsData = await getTestimonials();
+  const contentData = await getHomepageContent();
 
   const stats = [
     {
@@ -48,14 +49,14 @@ export default async function Home() {
           <div className="grid gap-6 md:grid-cols-2 lg:gap-16">
             <div className="flex flex-col justify-center space-y-2">
               <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl xl:text-7xl/none text-primary">
-                Innovate. Build. Empower.
+                {contentData.hero.headline}
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Codezcube delivers cutting-edge Web Development, Mobile Development, AI/ML, and EdTech solutions to transform your ideas into reality.
+                {contentData.hero.subtext}
               </p>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
                 <Button asChild size="lg">
-                  <Link href="/services">Discover Our Services</Link>
+                  <Link href={contentData.hero.ctaLink}>{contentData.hero.ctaText}</Link>
                 </Button>
               </div>
             </div>
@@ -207,12 +208,12 @@ export default async function Home() {
       <section id="cta" className="py-16 md:py-24 bg-primary text-primary-foreground">
         <div className="container">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Ready to Elevate Your Business?</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">{contentData.cta.headline}</h2>
             <p className="max-w-[800px] text-primary-foreground/80 md:text-xl">
-              Let's discuss how Codezcube can help you achieve your goals with our innovative tech solutions. Schedule a free consultation today!
+              {contentData.cta.subtext}
             </p>
             <Button asChild size="lg" variant="outline" className="mt-4 bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-              <Link href="/booking">Book a Free Consultation</Link>
+              <Link href={contentData.cta.ctaLink}>{contentData.cta.ctaText}</Link>
             </Button>
           </div>
         </div>
