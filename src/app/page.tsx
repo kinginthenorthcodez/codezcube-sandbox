@@ -48,12 +48,11 @@ export default async function Home() {
             </div>
             <div className="flex items-center justify-center">
               <Image
-                src="https://placehold.co/600x500.png"
+                src="https://firebasestorage.googleapis.com/v0/b/codezcube-sandbox.firebasestorage.app/o/images%2Fundraw_visionary-technology_6ouq.svg?alt=media&token=078b84e1-0ea0-440f-aa5e-66471552e10f"
                 width={600}
                 height={500}
-                alt="Hero Image"
-                className="mx-auto aspect-square overflow-hidden rounded-xl object-cover object-center"
-                data-ai-hint="developer holding phone"
+                alt="Visionary Technology"
+                className="mx-auto aspect-square overflow-hidden rounded-xl object-contain object-center"
               />
             </div>
           </div>
