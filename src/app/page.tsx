@@ -5,29 +5,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Briefcase, Zap, BarChartBig, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getHomepageStats } from '@/lib/actions';
 
-const stats = [
-  {
-    icon: <Briefcase className="w-8 h-8 text-primary" />,
-    value: '50+',
-    label: 'Projects Completed',
-  },
-  {
-    icon: <Zap className="w-8 h-8 text-primary" />,
-    value: '98%',
-    label: 'Client Satisfaction',
-  },
-  {
-    icon: <BarChartBig className="w-8 h-8 text-primary" />,
-    value: '5+',
-    label: 'Years of Experience',
-  },
-];
+export default async function Home() {
+  const statsData = await getHomepageStats();
 
-export default function Home() {
+  const stats = [
+    {
+      icon: <Briefcase className="w-8 h-8 text-primary" />,
+      value: statsData.projectsCompleted,
+      label: 'Projects Completed',
+    },
+    {
+      icon: <Zap className="w-8 h-8 text-primary" />,
+      value: statsData.clientSatisfaction,
+      label: 'Client Satisfaction',
+    },
+    {
+      icon: <BarChartBig className="w-8 h-8 text-primary" />,
+      value: statsData.yearsOfExperience,
+      label: 'Years of Experience',
+    },
+  ];
+
   return (
     <div className="flex flex-col">
-      <section className="py-16 sm:py-20 md:py-24">
+      <section className="py-12 sm:py-16 md:py-20">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:gap-16">
             <div className="flex flex-col justify-center space-y-2">

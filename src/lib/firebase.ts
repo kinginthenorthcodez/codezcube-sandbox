@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,6 +13,7 @@ const firebaseConfig = {
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
+let db: Firestore | null = null;
 
 // Check if the Firebase config keys are provided and are not the placeholder values.
 export const isFirebaseConfigured = !!(
@@ -24,6 +26,7 @@ if (isFirebaseConfigured) {
   try {
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
+    db = getFirestore(app);
   } catch(e) {
     console.error("Failed to initialize Firebase", e);
   }
@@ -31,4 +34,4 @@ if (isFirebaseConfigured) {
   console.warn("Firebase configuration is missing or invalid. Firebase services will be disabled.");
 }
 
-export { app, auth };
+export { app, auth, db };
