@@ -33,7 +33,7 @@ export default async function ServiceDetailPage({ params }: { params: { slug: st
                 <div className="order-2 md:order-1">
                     <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl text-primary mb-4">{service.title}</h1>
                     <div className="prose prose-lg text-muted-foreground max-w-none mb-6">
-                        {service.details.split('\\n').map((line, i) => <p key={i}>{line}</p>)}
+                        {service.details.split('\n').map((line, i) => <p key={i}>{line}</p>)}
                     </div>
                     <h2 className="text-2xl font-bold mb-4">Key Features</h2>
                     <ul className="space-y-3">

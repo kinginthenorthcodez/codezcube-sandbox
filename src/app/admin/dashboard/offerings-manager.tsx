@@ -59,9 +59,11 @@ function ServiceFormDialog({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const defaultValues = service 
-    ? { ...service, features: service.features.join('\\n'), imageFile: undefined } 
-    : { title: "", slug: "", description: "", details: "", iconName: "", features: "", order: 0, imageFile: undefined };
+  const defaultValues = React.useMemo(() => (
+    service 
+      ? { ...service, features: service.features.join('\n'), imageFile: undefined } 
+      : { title: "", slug: "", description: "", details: "", iconName: "", features: "", order: 0, imageFile: undefined }
+  ), [service]);
 
   const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
@@ -72,7 +74,7 @@ function ServiceFormDialog({
     if (isOpen) {
         form.reset(defaultValues);
     }
-  }, [service, form, isOpen, defaultValues]);
+  }, [isOpen, defaultValues, form]);
 
   const handleSubmit = async (data: ServiceFormData) => {
     setIsSubmitting(true);
