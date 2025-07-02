@@ -1,4 +1,5 @@
 
+
 export type HomepageStats = {
   projectsCompleted: string;
   clientSatisfaction: string;
@@ -46,6 +47,17 @@ export type PortfolioProject = {
   typographyAndColors: string;
   visualDesigns: string;
   thankYouNote: string;
+};
+
+export type Product = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  imageStoragePath: string;
+  productUrl: string;
+  order: number;
 };
 
 

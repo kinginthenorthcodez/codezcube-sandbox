@@ -1,11 +1,12 @@
 
+
 'use server';
 
 import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, where, limit, type DocumentSnapshot, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject, type Product } from '@/types';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -754,5 +755,125 @@ export async function deletePortfolioProject(id: string): Promise<{ success: boo
     } catch (error) {
         console.error('Error deleting project:', error);
         return { success: false, message: 'Failed to delete project.' };
+    }
+}
+
+// Product Actions
+export async function getProducts(): Promise<Product[]> {
+    const defaultProducts: Omit<Product, 'id'>[] = [
+        {
+            title: "CodezCube Learn",
+            description: "An interactive e-learning platform designed to make technology education accessible and engaging for students across Africa.",
+            category: "EdTech",
+            imageUrl: "https://placehold.co/600x400.png",
+            imageStoragePath: "",
+            productUrl: "#",
+            order: 1
+        },
+    ];
+
+    if (!db) {
+        console.warn('Firestore is not initialized. Serving default products.');
+        return defaultProducts.map((p, i) => ({ ...p, id: `default-${i}` }));
+    }
+    try {
+        const productsCol = collection(db, 'products');
+        const q = query(productsCol, orderBy('order'));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            console.log('No products found, seeding with default data.');
+            for (const product of defaultProducts) {
+                await addDoc(collection(db, 'products'), product);
+            }
+            const seededSnapshot = await getDocs(q);
+            return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+        }
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return defaultProducts.map((p, i) => ({ ...p, id: `default-${i}` }));
+    }
+}
+
+export async function addProduct(formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
+
+    const imageFile = formData.get('imageFile') as File;
+    if (!imageFile || imageFile.size === 0) {
+        return { success: false, message: 'Product image is required.' };
+    }
+
+    try {
+        const { url, storagePath } = await handleFileUpload(imageFile, 'product-images');
+        const newProduct: Omit<Product, 'id'> = {
+            title: formData.get('title') as string,
+            description: formData.get('description') as string,
+            category: formData.get('category') as string,
+            productUrl: formData.get('productUrl') as string,
+            order: Number(formData.get('order')),
+            imageUrl: url,
+            imageStoragePath: storagePath,
+        };
+
+        await addDoc(collection(db, 'products'), newProduct);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/products');
+        return { success: true, message: 'Product added successfully.' };
+    } catch (error) {
+        console.error('Error adding product:', error);
+        return { success: false, message: 'Failed to add product.' };
+    }
+}
+
+export async function updateProduct(id: string, formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+
+    try {
+        const docRef = doc(db, 'products', id);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return { success: false, message: 'Product not found.' };
+
+        const existingProduct = docSnap.data() as Product;
+        const productUpdate: Partial<Product> = {
+            title: formData.get('title') as string,
+            description: formData.get('description') as string,
+            category: formData.get('category') as string,
+            productUrl: formData.get('productUrl') as string,
+            order: Number(formData.get('order')),
+        };
+
+        const imageFile = formData.get('imageFile') as File;
+        if (imageFile && imageFile.size > 0) {
+            await handleDeleteFile(existingProduct.imageStoragePath);
+            const { url, storagePath } = await handleFileUpload(imageFile, 'product-images');
+            productUpdate.imageUrl = url;
+            productUpdate.imageStoragePath = storagePath;
+        }
+
+        await updateDoc(docRef, productUpdate);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/products');
+        return { success: true, message: 'Product updated successfully.' };
+    } catch (error) {
+        console.error('Error updating product:', error);
+        return { success: false, message: 'Failed to update product.' };
+    }
+}
+
+export async function deleteProduct(id: string): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+    try {
+        const docRef = doc(db, 'products', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            await handleDeleteFile(docSnap.data().imageStoragePath);
+        }
+        await deleteDoc(docRef);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/products');
+        return { success: true, message: 'Product deleted successfully.' };
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        return { success: false, message: 'Failed to delete product.' };
     }
 }

@@ -11,6 +11,7 @@ import { TestimonialsManager } from "./testimonials-manager";
 import { HomepageContentManager } from "./homepage-content-manager";
 import { SiteConfigurationManager } from "./site-configuration-manager";
 import { PortfolioManager } from "./portfolio-manager";
+import { ProductsManager } from "./products-manager";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -56,6 +57,9 @@ export default function DashboardPage() {
       </div>
       <div id="portfolio">
         <PortfolioManager />
+      </div>
+      <div id="products">
+        <ProductsManager />
       </div>
       <div id="clients">
         <ClientsManager />
