@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { HomepageStatsForm } from "./homepage-stats-form";
 import { ServicesManager } from "./services-manager";
+import { ClientsManager } from "./clients-manager";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -35,6 +36,7 @@ export default function DashboardPage() {
       
       <HomepageStatsForm />
       <ServicesManager />
+      <ClientsManager />
     </div>
   );
 }

@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Briefcase, Zap, BarChartBig, Star, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getHomepageStats, getServices } from '@/lib/actions';
+import { getHomepageStats, getServices, getClients } from '@/lib/actions';
 import * as icons from 'lucide-react';
 
 export default async function Home() {
   const statsData = await getHomepageStats();
   const servicesData = await getServices();
+  const clientsData = await getClients();
 
   const stats = [
     {
@@ -124,6 +125,22 @@ export default async function Home() {
                 <p className="text-muted-foreground mt-2">{stat.label}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-16">
+            <div className="flex items-center justify-center gap-x-8 gap-y-4 flex-wrap">
+              {clientsData.map((client) => (
+                <div key={client.id} title={client.name}>
+                  <Image
+                    src={client.logoUrl}
+                    alt={`${client.name} Logo`}
+                    width={150}
+                    height={60}
+                    className="object-contain grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300"
+                    data-ai-hint="company logo"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

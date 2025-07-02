@@ -15,3 +15,9 @@ export type Service = {
   imageUrl: string;
   order: number;
 };
+
+export type Client = {
+  id: string;
+  name: string;
+  logoUrl: string;
+};

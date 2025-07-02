@@ -3,7 +3,7 @@
 import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, deleteDoc, where, limit } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/firebase';
-import { type HomepageStats, type Service } from '@/types';
+import { type HomepageStats, type Service, type Client } from '@/types';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -193,5 +193,80 @@ export async function deleteService(id: string): Promise<{ success: boolean; mes
     } catch (error) {
         console.error('Error deleting service:', error);
         return { success: false, message: 'Failed to delete service.' };
+    }
+}
+
+// Client Management Actions
+const defaultClients: Omit<Client, 'id'>[] = [
+  { name: 'Innovate Inc.', logoUrl: 'https://placehold.co/150x60.png' },
+  { name: 'Future Corp.', logoUrl: 'https://placehold.co/150x60.png' },
+  { name: 'Synergy Solutions', logoUrl: 'https://placehold.co/150x60.png' },
+  { name: 'Apex Enterprises', logoUrl: 'https://placehold.co/150x60.png' },
+];
+
+export async function getClients(): Promise<Client[]> {
+  if (!db) {
+    console.warn('Firestore is not initialized. Serving default clients.');
+    return defaultClients.map((c, i) => ({ ...c, id: `default-${i}` }));
+  }
+  try {
+    const clientsCol = collection(db, 'clients');
+    const q = query(clientsCol, orderBy('name'));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.log('No clients found, seeding with default data.');
+      for (const client of defaultClients) {
+        await addDoc(collection(db, 'clients'), client);
+      }
+      const seededSnapshot = await getDocs(q);
+      return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client));
+    }
+
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client));
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    return defaultClients.map((c, i) => ({ ...c, id: `default-${i}` }));
+  }
+}
+
+export async function addClient(client: Omit<Client, 'id'>): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firestore is not initialized.' };
+    try {
+        await addDoc(collection(db, 'clients'), client);
+        revalidatePath('/');
+        revalidatePath('/admin/dashboard');
+        return { success: true, message: 'Client added successfully.' };
+    } catch (error) {
+        console.error('Error adding client:', error);
+        return { success: false, message: 'Failed to add client.' };
+    }
+}
+
+export async function updateClient(id: string, client: Partial<Omit<Client, 'id'>>): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firestore is not initialized.' };
+    try {
+        const docRef = doc(db, 'clients', id);
+        await setDoc(docRef, client, { merge: true });
+        revalidatePath('/');
+        revalidatePath('/admin/dashboard');
+        return { success: true, message: 'Client updated successfully.' };
+    } catch (error) {
+        console.error('Error updating client:', error);
+        return { success: false, message: 'Failed to update client.' };
+    }
+}
+
+export async function deleteClient(id: string): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firestore is not initialized.' };
+    try {
+        const docRef = doc(db, 'clients', id);
+        await deleteDoc(docRef);
+        revalidatePath('/');
+        revalidatePath('/admin/dashboard');
+        return { success: true, message: 'Client deleted successfully.' };
+    } catch (error) {
+        console.error('Error deleting client:', error);
+        return { success: false, message: 'Failed to delete client.' };
     }
 }
