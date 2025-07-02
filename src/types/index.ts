@@ -17,6 +17,19 @@ export type Service = {
   order: number;
 };
 
+export type PortfolioProject = {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  description: string; // Short description for list/card view
+  details: string; // Full case study content for detail page
+  tags: string[];
+  imageUrl: string;
+  imageStoragePath: string;
+  order: number;
+};
+
 export type Client = {
   id:string;
   name: string;

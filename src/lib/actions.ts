@@ -4,7 +4,7 @@ import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updat
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject } from '@/types';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -537,4 +537,145 @@ export async function updateSiteConfiguration(config: SiteConfiguration): Promis
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, message: `Failed to update site config: ${errorMessage}` };
   }
+}
+
+// Portfolio Project Actions
+const defaultPortfolioProjects: Omit<PortfolioProject, 'id'>[] = [
+    {
+        slug: "ecommerce-platform-revamp",
+        title: "E-commerce Platform Revamp",
+        category: "Web Development",
+        description: "A complete overhaul of a leading online retailer's platform to enhance user experience and improve performance.",
+        details: "We partnered with a major e-commerce brand to redesign and rebuild their online platform from the ground up. The project involved migrating to a modern tech stack (Next.js, Firebase), implementing a new design system for a responsive user interface, and optimizing the backend for faster load times and scalability. The new platform resulted in a 40% increase in conversion rates and a 60% improvement in page load speed.",
+        tags: ["Next.js", "Firebase", "E-commerce", "UX/UI Design"],
+        imageUrl: "https://placehold.co/600x400.png",
+        imageStoragePath: "",
+        order: 1
+    },
+];
+
+export async function getPortfolioProjects(): Promise<PortfolioProject[]> {
+    if (!db) {
+        console.warn('Firestore is not initialized. Serving default projects.');
+        return defaultPortfolioProjects.map((p, i) => ({ ...p, id: `default-${i}` }));
+    }
+    try {
+        const projectsCol = collection(db, 'portfolio');
+        const q = query(projectsCol, orderBy('order'));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            console.log('No portfolio projects found, seeding with default data.');
+            for (const project of defaultPortfolioProjects) {
+                await addDoc(collection(db, 'portfolio'), project);
+            }
+            const seededSnapshot = await getDocs(q);
+            return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioProject));
+        }
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioProject));
+    } catch (error) {
+        console.error('Error fetching portfolio projects:', error);
+        return defaultPortfolioProjects.map((p, i) => ({ ...p, id: `default-${i}` }));
+    }
+}
+
+export async function getPortfolioProjectBySlug(slug: string): Promise<PortfolioProject | null> {
+    if (!db) return null;
+    try {
+        const q = query(collection(db, 'portfolio'), where("slug", "==", slug), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) return null;
+        const doc = querySnapshot.docs[0];
+        return { id: doc.id, ...doc.data() } as PortfolioProject;
+    } catch (error) {
+        console.error('Error fetching portfolio project by slug:', error);
+        return null;
+    }
+}
+
+export async function addPortfolioProject(formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
+
+    const imageFile = formData.get('imageFile') as File;
+    if (!imageFile || imageFile.size === 0) {
+        return { success: false, message: 'Project image is required.' };
+    }
+
+    try {
+        const { url, storagePath } = await handleFileUpload(imageFile, 'portfolio-images');
+        const newProject = {
+            title: formData.get('title') as string,
+            slug: formData.get('slug') as string,
+            category: formData.get('category') as string,
+            description: formData.get('description') as string,
+            details: formData.get('details') as string,
+            tags: (formData.get('tags') as string).split('\n').map(t => t.trim()).filter(t => t),
+            order: Number(formData.get('order')),
+            imageUrl: url,
+            imageStoragePath: storagePath,
+        };
+
+        await addDoc(collection(db, 'portfolio'), newProject);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/portfolio');
+        return { success: true, message: 'Project added successfully.' };
+    } catch (error) {
+        console.error('Error adding project:', error);
+        return { success: false, message: 'Failed to add project.' };
+    }
+}
+
+export async function updatePortfolioProject(id: string, formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+
+    try {
+        const docRef = doc(db, 'portfolio', id);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return { success: false, message: 'Project not found.' };
+
+        const existingProject = docSnap.data() as PortfolioProject;
+        const projectUpdate: Partial<PortfolioProject> = {
+            title: formData.get('title') as string,
+            slug: formData.get('slug') as string,
+            category: formData.get('category') as string,
+            description: formData.get('description') as string,
+            details: formData.get('details') as string,
+            tags: (formData.get('tags') as string).split('\n').map(t => t.trim()).filter(t => t),
+            order: Number(formData.get('order')),
+        };
+
+        const imageFile = formData.get('imageFile') as File;
+        if (imageFile && imageFile.size > 0) {
+            await handleDeleteFile(existingProject.imageStoragePath);
+            const { url, storagePath } = await handleFileUpload(imageFile, 'portfolio-images');
+            projectUpdate.imageUrl = url;
+            projectUpdate.imageStoragePath = storagePath;
+        }
+
+        await updateDoc(docRef, projectUpdate);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/portfolio');
+        revalidatePath(`/portfolio/${projectUpdate.slug}`);
+        return { success: true, message: 'Project updated successfully.' };
+    } catch (error) {
+        console.error('Error updating project:', error);
+        return { success: false, message: 'Failed to update project.' };
+    }
+}
+
+export async function deletePortfolioProject(id: string): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+    try {
+        const docRef = doc(db, 'portfolio', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            await handleDeleteFile(docSnap.data().imageStoragePath);
+        }
+        await deleteDoc(docRef);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/portfolio');
+        return { success: true, message: 'Project deleted successfully.' };
+    } catch (error) {
+        console.error('Error deleting project:', error);
+        return { success: false, message: 'Failed to delete project.' };
+    }
 }
