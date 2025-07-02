@@ -2,7 +2,7 @@ import { getPortfolioProjectBySlug, getPortfolioProjects } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, Clock, Target, PenTool, Brain, Search, Map, Bot, Palette, MonitorPlay, ThumbsUp, Clapperboard, Type, Microscope, BookUser, Workflow, Shuffle, Architecture, Lightbulb } from "lucide-react";
+import { ArrowLeft, Users, Clock, Target, PenTool, Brain, Search, Map, Bot, Palette, MonitorPlay, ThumbsUp, Clapperboard, Type, Microscope, BookUser, Workflow, Shuffle, Network, Lightbulb, BarChartBig } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -120,7 +120,7 @@ export default async function PortfolioDetailPage({ params }: { params: { slug: 
                             <TimelineSubSection title="Empathy Map" icon={<Map className="h-5 w-5"/>}><p>An empathy map to visualize user attitudes and behaviors. [Placeholder content]</p></TimelineSubSection>
                             <TimelineSubSection title="Task Flow" icon={<Workflow className="h-5 w-5"/>}><p>Diagrams or descriptions of the primary user task flows. [Placeholder content]</p></TimelineSubSection>
                             <TimelineSubSection title="Card Sorting" icon={<Shuffle className="h-5 w-5"/>}><p>Information on how card sorting was used to inform the information architecture. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Information Architecture" icon={<Architecture className="h-5 w-5"/>}><p>The resulting information architecture for the application. [Placeholder content]</p></TimelineSubSection>
+                            <TimelineSubSection title="Information Architecture" icon={<Network className="h-5 w-5"/>}><p>The resulting information architecture for the application. [Placeholder content]</p></TimelineSubSection>
                         </TimelineItem>
 
                         <TimelineItem title="Design Phase" icon={<Palette />}>
