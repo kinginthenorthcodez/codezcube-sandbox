@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { HomepageStatsForm } from "./homepage-stats-form";
+import { OfferingsManager } from "./offerings-manager";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -33,6 +34,7 @@ export default function DashboardPage() {
       </Card>
       
       <HomepageStatsForm />
+      <OfferingsManager />
     </div>
   );
 }

@@ -2,13 +2,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, Zap, BarChartBig, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getHomepageStats } from '@/lib/actions';
+import { getHomepageStats, getOfferings } from '@/lib/actions';
+import { type Offering } from '@/types';
+import * as icons from 'lucide-react';
 
 export default async function Home() {
   const statsData = await getHomepageStats();
+  const offeringsData = await getOfferings();
 
   const stats = [
     {
@@ -27,6 +30,14 @@ export default async function Home() {
       label: 'Years of Experience',
     },
   ];
+
+  const DynamicIcon = ({ name }: { name: string }) => {
+    const LucideIcon = icons[name as keyof typeof icons] as icons.LucideProps;
+    if (!LucideIcon) {
+      return <icons.HelpCircle className="w-10 h-10 text-primary" />;
+    }
+    return <LucideIcon className="w-10 h-10 text-primary" />;
+  };
 
   return (
     <div className="flex flex-col">
@@ -61,11 +72,26 @@ export default async function Home() {
 
       <section id="offerings" className="py-16 md:py-24 bg-secondary">
         <div className="container">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Our Core Offerings</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               We provide a comprehensive suite of technology services designed to elevate your business, from initial concept to final deployment.
             </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {offeringsData.map((offering) => (
+              <Card key={offering.id} className="text-center flex flex-col items-center p-6 hover:shadow-lg transition-shadow">
+                <div className="mb-4 bg-primary/10 p-4 rounded-full">
+                  <DynamicIcon name={offering.icon} />
+                </div>
+                <CardHeader className="p-0 mb-2">
+                  <CardTitle className="text-xl">{offering.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-muted-foreground text-sm">{offering.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
