@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader } from "@/components/ui/sheet"
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "@/hooks/use-auth"
@@ -68,7 +68,6 @@ export function Header() {
               <SheetContent side="right" className="flex flex-col p-0">
                  <SheetHeader className="p-4 border-b">
                     <Logo />
-                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                   </SheetHeader>
                 <nav className="flex flex-col items-start gap-4 p-4">
                   {navLinks.map((link) => (
@@ -89,7 +88,7 @@ export function Header() {
                       <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
                      </>
                   ) : (
-                      <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin">Login</Link></Button>
+                      <Button asChild onClick={() => setIsOpen(false)}><Link href="/login">Login</Link></Button>
                   )}
                 </div>
               </SheetContent>
@@ -98,14 +97,18 @@ export function Header() {
         </div>
 
         {/* === Desktop View === */}
-        <div className="hidden w-full items-center justify-evenly md:flex">
+        <div className="hidden w-full items-center md:flex">
           {/* Left side: Logo + Nav */}
-          <div className="flex items-center gap-6 lg:gap-10">
+          <div className="flex flex-1 items-center gap-6 lg:gap-10">
             <Logo />
-            <nav className="hidden items-center gap-4 md:flex lg:gap-6">
-              {navLinks.map((link) => (
-                <NavLink key={link.href} {...link} />
-              ))}
+            <nav className="flex-1">
+              <ul className="flex items-center justify-center gap-4 lg:gap-6">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <NavLink {...link} />
+                  </li>
+                ))}
+              </ul>
             </nav>
           </div>
           
@@ -146,7 +149,7 @@ export function Header() {
               </DropdownMenu>
             ) : (
               <Button asChild>
-                <Link href="/admin">Login</Link>
+                <Link href="/login">Login</Link>
               </Button>
             )}
           </div>

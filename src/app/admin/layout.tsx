@@ -2,24 +2,24 @@
 
 import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     if (loading) return; // Wait until loading is finished
 
-    // If there's no user and we are not on the login page, redirect to login
-    if (!user && pathname !== '/admin') {
-      router.push('/admin');
+    // If there's no user, redirect to login page.
+    // This layout protects all routes under /admin/*
+    if (!user) {
+      router.push('/login');
     }
-  }, [user, loading, pathname, router]);
+  }, [user, loading, router]);
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="flex h-[80vh] w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -27,6 +27,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Render children if user is loaded and on a valid path
+  // Render children if user is authenticated
   return <>{children}</>;
 }
