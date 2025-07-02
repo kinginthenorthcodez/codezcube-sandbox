@@ -4,53 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { generateProjects } from '@/ai/flows/portfolio-projects-flow';
 
-const projects = [
-  {
-    title: "SME E-commerce Platform",
-    description: "A full-featured e-commerce solution for small and medium enterprises in Zambia, enabling them to sell their products online.",
-    category: "Web Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "online store shopping",
-  },
-  {
-    title: "AI-Powered Learning Assistant",
-    description: "An intelligent chatbot and learning platform that provides personalized educational support for students.",
-    category: "AI/ML",
-    image: "https://placehold.co/600x400.png",
-    hint: "robot chatbot education",
-  },
-  {
-    title: "National NGO Digital Portal",
-    description: "A comprehensive web portal for a major NGO, featuring resource management, event scheduling, and community engagement tools.",
-    category: "Web Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "community website charity",
-  },
-  {
-    title: "Mobile App for Farmers",
-    description: "A cross-platform mobile app providing farmers with real-time weather data, market prices, and agricultural advice.",
-    category: "Mobile Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "agriculture app phone",
-  },
-  {
-    title: "Government Service Automation",
-    description: "An AI-driven system to automate and streamline public service requests for a government department.",
-    category: "AI/ML",
-    image: "https://placehold.co/600x400.png",
-    hint: "government technology automation",
-  },
-  {
-    title: "Interactive EdTech Game",
-    description: "A gamified learning experience for primary school students, making mathematics fun and engaging.",
-    category: "EdTech",
-    image: "https://placehold.co/600x400.png",
-    hint: "kids game learning",
-  },
-];
+export default async function PortfolioPage() {
+  const { projects } = await generateProjects({ topic: "Innovative Tech Solutions for Africa" });
 
-export default function PortfolioPage() {
   return (
     <div className="container py-16 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
