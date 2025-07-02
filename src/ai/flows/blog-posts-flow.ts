@@ -20,7 +20,7 @@ const BlogPostSchema = z.object({
   author: z.string().describe("The name of the author, like 'John D.'."),
   date: z.string().describe("The publication date in 'Month Day, Year' format."),
   category: z.string().describe('The primary category of the blog post (e.g., AI/ML, Web Development, Tech in Africa).'),
-  image: z.string().url().describe("A placeholder image URL (600x400) from placehold.co."),
+  image: z.string().describe("A placeholder image URL (600x400) from placehold.co."),
   hint: z.string().describe("A two-word hint for generating an image for the post, like 'artificial intelligence'."),
   excerpt: z.string().describe('A short, compelling one-sentence summary of the post.'),
 });
