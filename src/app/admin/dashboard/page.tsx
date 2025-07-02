@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { HomepageStatsForm } from "./homepage-stats-form";
-import { ServicesManager } from "./services-manager";
+import { ServicesManager } from "./offerings-manager";
 import { ClientsManager } from "./clients-manager";
 
 export default function DashboardPage() {
