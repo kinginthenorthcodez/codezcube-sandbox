@@ -20,4 +20,6 @@ export type Client = {
   id: string;
   name: string;
   logoUrl: string;
+  logoStoragePath: string;
+  dataAiHint: string;
 };

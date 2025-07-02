@@ -19,6 +19,7 @@ import Image from "next/image";
 const clientSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   logoUrl: z.string().url("Please enter a valid URL for the logo."),
+  dataAiHint: z.string().min(2, "AI hint must be at least 2 characters.").max(40, "Hint is too long."),
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -38,20 +39,29 @@ function ClientFormDialog({
 
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
-    defaultValues: client ? { name: client.name, logoUrl: client.logoUrl } : { name: "", logoUrl: "" },
+    defaultValues: client
+      ? { name: client.name, logoUrl: client.logoUrl, dataAiHint: client.dataAiHint }
+      : { name: "", logoUrl: "", dataAiHint: "" },
   });
 
   React.useEffect(() => {
     if (isOpen) {
-      form.reset(client ? { name: client.name, logoUrl: client.logoUrl } : { name: "", logoUrl: "" });
+      form.reset(client
+        ? { name: client.name, logoUrl: client.logoUrl, dataAiHint: client.dataAiHint }
+        : { name: "", logoUrl: "", dataAiHint: "" });
     }
   }, [client, form, isOpen]);
 
   const handleSubmit = async (data: ClientFormData) => {
     setIsSubmitting(true);
+    const clientData: Omit<Client, 'id'> = {
+        ...data,
+        logoStoragePath: client?.logoStoragePath || ""
+    };
+
     const action = client
-      ? updateClient(client.id, data)
-      : addClient(data);
+      ? updateClient(client.id, clientData)
+      : addClient(clientData);
 
     const result = await action;
     if (result.success) {
@@ -91,6 +101,17 @@ function ClientFormDialog({
                 <FormItem>
                   <FormLabel>Logo URL</FormLabel>
                   <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dataAiHint"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image AI Hint</FormLabel>
+                  <FormControl><Input placeholder="e.g. company logo" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -176,7 +197,7 @@ export function ClientsManager() {
                                   width={100} 
                                   height={40} 
                                   className="object-contain"
-                                  data-ai-hint="company logo"
+                                  data-ai-hint={client.dataAiHint}
                                 />
                                 <h3 className="font-semibold">{client.name}</h3>
                             </div>

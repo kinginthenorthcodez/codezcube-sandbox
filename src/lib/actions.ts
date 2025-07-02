@@ -198,10 +198,10 @@ export async function deleteService(id: string): Promise<{ success: boolean; mes
 
 // Client Management Actions
 const defaultClients: Omit<Client, 'id'>[] = [
-  { name: 'Innovate Inc.', logoUrl: 'https://placehold.co/150x60.png' },
-  { name: 'Future Corp.', logoUrl: 'https://placehold.co/150x60.png' },
-  { name: 'Synergy Solutions', logoUrl: 'https://placehold.co/150x60.png' },
-  { name: 'Apex Enterprises', logoUrl: 'https://placehold.co/150x60.png' },
+  { name: 'Innovate Inc.', logoUrl: 'https://placehold.co/150x60.png', logoStoragePath: '', dataAiHint: 'tech company' },
+  { name: 'Future Corp.', logoUrl: 'https://placehold.co/150x60.png', logoStoragePath: '', dataAiHint: 'corporate logo' },
+  { name: 'Synergy Solutions', logoUrl: 'https://placehold.co/150x60.png', logoStoragePath: '', dataAiHint: 'consulting firm' },
+  { name: 'Apex Enterprises', logoUrl: 'https://placehold.co/150x60.png', logoStoragePath: '', dataAiHint: 'global enterprise' },
 ];
 
 export async function getClients(): Promise<Client[]> {
