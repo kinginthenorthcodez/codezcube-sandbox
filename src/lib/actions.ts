@@ -1,5 +1,3 @@
-
-
 'use server';
 
 import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, where, limit, type DocumentSnapshot, type QueryDocumentSnapshot } from 'firebase/firestore';
@@ -23,12 +21,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
   try {
     const docRef = doc(db, 'homepage', 'stats');
     const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return docSnap.data() as HomepageStats;
-    } else {
-      return defaultStats;
-    }
+    return docSnap.exists() ? docSnap.data() as HomepageStats : defaultStats;
   } catch (error) {
     console.error('Error fetching homepage stats from Firestore.', error);
     return defaultStats;
@@ -766,3 +759,4 @@ export async function deleteProduct(id: string): Promise<{ success: boolean; mes
         return { success: false, message: 'Failed to delete product.' };
     }
 }
+    
