@@ -18,25 +18,33 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container py-16 md:py-24 space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-3xl">Welcome to your Dashboard</CardTitle>
-          <CardDescription>
-            You are logged in as {user ? user.email : '...'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-6">This is your protected dashboard page. Only authenticated users can see this.</p>
-          <Button onClick={handleSignOut}>
-            Sign Out
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="space-y-8">
+      <div id="info">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl">Welcome to your Dashboard</CardTitle>
+            <CardDescription>
+              You are logged in as {user ? user.email : '...'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-6">This is your protected dashboard page. Only authenticated users can see this.</p>
+            <Button onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
       
-      <HomepageStatsForm />
-      <ServicesManager />
-      <ClientsManager />
+      <div id="stats">
+        <HomepageStatsForm />
+      </div>
+      <div id="services">
+        <ServicesManager />
+      </div>
+      <div id="clients">
+        <ClientsManager />
+      </div>
     </div>
   );
 }
