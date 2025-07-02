@@ -4,10 +4,14 @@ export type HomepageStats = {
   yearsOfExperience: string;
 };
 
-export type Offering = {
+export type Service = {
   id: string;
+  slug: string;
   title: string;
-  description: string;
-  icon: string; // lucide-react icon name
+  description: string; // short description for homepage card
+  details: string; // long description for service page
+  features: string[];
+  iconName: string;
+  imageUrl: string;
   order: number;
 };

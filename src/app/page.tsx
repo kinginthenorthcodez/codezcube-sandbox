@@ -2,16 +2,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, Zap, BarChartBig, Star } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Briefcase, Zap, BarChartBig, Star, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getHomepageStats, getOfferings } from '@/lib/actions';
-import { type Offering } from '@/types';
+import { getHomepageStats, getServices } from '@/lib/actions';
 import * as icons from 'lucide-react';
 
 export default async function Home() {
   const statsData = await getHomepageStats();
-  const offeringsData = await getOfferings();
+  const servicesData = await getServices();
 
   const stats = [
     {
@@ -31,12 +30,12 @@ export default async function Home() {
     },
   ];
 
-  const DynamicIcon = ({ name }: { name: string }) => {
-    const LucideIcon = icons[name as keyof typeof icons] as icons.LucideProps;
+  const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
+    const LucideIcon = icons[name as keyof typeof icons] as React.ElementType;
     if (!LucideIcon) {
-      return <icons.HelpCircle className="w-10 h-10 text-primary" />;
+      return <HelpCircle className={className || "w-10 h-10 text-primary"} />;
     }
-    return <LucideIcon className="w-10 h-10 text-primary" />;
+    return <LucideIcon className={className || "w-10 h-10 text-primary"} />;
   };
 
   return (
@@ -78,19 +77,32 @@ export default async function Home() {
               We provide a comprehensive suite of technology services designed to elevate your business, from initial concept to final deployment.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {offeringsData.map((offering) => (
-              <Card key={offering.id} className="text-center flex flex-col items-center p-6 hover:shadow-lg transition-shadow">
-                <div className="mb-4 bg-primary/10 p-4 rounded-full">
-                  <DynamicIcon name={offering.icon} />
-                </div>
-                <CardHeader className="p-0 mb-2">
-                  <CardTitle className="text-xl">{offering.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="text-muted-foreground text-sm">{offering.description}</p>
-                </CardContent>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {servicesData.map((service) => (
+               <Card key={service.id} className="flex flex-col">
+                 <CardContent className="p-6 flex-grow">
+                    <div className="flex items-start gap-4 mb-4">
+                        <div className="p-3 rounded-full bg-accent/10 text-accent">
+                            <DynamicIcon name={service.iconName} className="w-6 h-6" />
+                        </div>
+                        <CardTitle className="text-2xl mt-1 leading-tight">{service.title}</CardTitle>
+                    </div>
+                    <CardDescription className="mb-6">{service.description}</CardDescription>
+                    <ul className="space-y-3">
+                        {service.features.slice(0, 3).map((feature, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                                <CheckCircle2 className="h-4 w-4 mt-1 text-accent flex-shrink-0" />
+                                <span className="text-sm text-muted-foreground">{feature}</span>
+                            </li>
+                        ))}
+                    </ul>
+                 </CardContent>
+                 <div className="p-6 pt-0">
+                    <Button asChild variant="outline" className="w-full">
+                        <Link href={`/services/${service.slug}`}>Learn More</Link>
+                    </Button>
+                 </div>
+               </Card>
             ))}
           </div>
         </div>

@@ -4,10 +4,10 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { getOfferings, addOffering, updateOffering, deleteOffering } from "@/lib/actions";
-import { type Offering } from "@/types";
+import { getServices, addService, updateService, deleteService } from "@/lib/actions";
+import { type Service } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription as FormDesc } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -16,13 +16,20 @@ import { Loader2, PlusCircle, Trash, Edit, HelpCircle } from "lucide-react";
 import * as icons from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-const offeringSchema = z.object({
+const serviceSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters."),
-    description: z.string().min(10, "Description must be at least 10 characters."),
-    icon: z.string().min(1, "Icon name is required."),
+    slug: z.string().min(3, "Slug must be at least 3 characters.").regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens."),
+    description: z.string().min(10, "Short description must be at least 10 characters."),
+    details: z.string().min(20, "Detailed description must be at least 20 characters."),
+    iconName: z.string().min(1, "Icon name is required."),
+    imageUrl: z.string().url("Image URL must be a valid URL."),
+    features: z.string().min(1, "Please provide at least one feature."),
     order: z.coerce.number().int().min(0),
 });
+
+type ServiceFormData = z.infer<typeof serviceSchema>;
 
 const DynamicIcon = ({ name }: { name: string }) => {
     const LucideIcon = icons[name as keyof typeof icons] as React.ElementType;
@@ -32,33 +39,45 @@ const DynamicIcon = ({ name }: { name: string }) => {
     return <LucideIcon className="w-8 h-8 text-primary" />;
 };
 
-function OfferingFormDialog({
+function ServiceFormDialog({
   trigger,
-  offering,
+  service,
   onSave,
 }: {
   trigger: React.ReactNode;
-  offering?: Offering;
+  service?: Service;
   onSave: () => Promise<void>;
 }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const form = useForm<z.infer<typeof offeringSchema>>({
-    resolver: zodResolver(offeringSchema),
-    defaultValues: offering || { title: "", description: "", icon: "", order: 0 },
+  const form = useForm<ServiceFormData>({
+    resolver: zodResolver(serviceSchema),
+    defaultValues: service 
+      ? { ...service, features: service.features.join('\n') } 
+      : { title: "", slug: "", description: "", details: "", iconName: "", imageUrl: "", features: "", order: 0 },
   });
 
   React.useEffect(() => {
-    form.reset(offering || { title: "", description: "", icon: "", order: 0 });
-  }, [offering, form, isOpen]);
+    if (isOpen) {
+        form.reset(service 
+          ? { ...service, features: service.features.join('\n') } 
+          : { title: "", slug: "", description: "", details: "", iconName: "", imageUrl: "", features: "", order: 0 }
+        );
+    }
+  }, [service, form, isOpen]);
 
-  const handleSubmit = async (data: z.infer<typeof offeringSchema>) => {
+  const handleSubmit = async (data: ServiceFormData) => {
     setIsSubmitting(true);
-    const action = offering
-      ? updateOffering(offering.id, data)
-      : addOffering(data);
+    const serviceData = {
+        ...data,
+        features: data.features.split('\n').map(f => f.trim()).filter(f => f),
+    };
+
+    const action = service
+      ? updateService(service.id, serviceData)
+      : addService(serviceData);
 
     const result = await action;
     if (result.success) {
@@ -74,12 +93,14 @@ function OfferingFormDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{offering ? 'Edit Offering' : 'Add New Offering'}</DialogTitle>
+          <DialogTitle>{service ? 'Edit Service' : 'Add New Service'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <ScrollArea className="h-[60vh] pr-6">
+            <div className="space-y-4">
             <FormField control={form.control} name="title" render={({ field }) => (
               <FormItem>
                 <FormLabel>Title</FormLabel>
@@ -87,17 +108,51 @@ function OfferingFormDialog({
                 <FormMessage />
               </FormItem>
             )} />
-            <FormField control={form.control} name="description" render={({ field }) => (
+            <FormField control={form.control} name="slug" render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl><Textarea {...field} /></FormControl>
+                <FormLabel>Slug</FormLabel>
+                <FormControl><Input placeholder="e.g. web-development" {...field} /></FormControl>
+                <FormDesc>A unique, URL-friendly identifier.</FormDesc>
                 <FormMessage />
               </FormItem>
             )} />
-            <FormField control={form.control} name="icon" render={({ field }) => (
+             <FormField control={form.control} name="description" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Short Description</FormLabel>
+                <FormControl><Textarea {...field} /></FormControl>
+                <FormDesc>A brief summary for homepage cards.</FormDesc>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="details" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Detailed Description</FormLabel>
+                <FormControl><Textarea className="min-h-[150px]" {...field} /></FormControl>
+                 <FormDesc>The full description for the service detail page. Use \\n for line breaks.</FormDesc>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="iconName" render={({ field }) => (
               <FormItem>
                 <FormLabel>Icon Name</FormLabel>
-                <FormControl><Input placeholder="e.g. Code, Smartphone" {...field} /></FormControl>
+                <FormControl><Input placeholder="e.g. BrainCircuit" {...field} /></FormControl>
+                <FormDesc>A valid `lucide-react` icon name.</FormDesc>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="imageUrl" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image URL</FormLabel>
+                <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                <FormDesc>The main image for the service detail page.</FormDesc>
+                <FormMessage />
+              </FormItem>
+            )} />
+             <FormField control={form.control} name="features" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Features</FormLabel>
+                <FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl>
+                <FormDesc>Enter one feature per line.</FormDesc>
                 <FormMessage />
               </FormItem>
             )} />
@@ -105,10 +160,13 @@ function OfferingFormDialog({
               <FormItem>
                 <FormLabel>Order</FormLabel>
                 <FormControl><Input type="number" {...field} /></FormControl>
+                <FormDesc>The display order on the homepage.</FormDesc>
                 <FormMessage />
               </FormItem>
             )} />
-            <DialogFooter>
+            </div>
+            </ScrollArea>
+            <DialogFooter className="mt-6 pt-4 border-t">
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -122,43 +180,42 @@ function OfferingFormDialog({
   );
 }
 
-
-export function OfferingsManager() {
+export function ServicesManager() {
     const { toast } = useToast();
-    const [offerings, setOfferings] = React.useState<Offering[]>([]);
+    const [services, setServices] = React.useState<Service[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
 
-    const fetchAndSetOfferings = React.useCallback(async () => {
+    const fetchAndSetServices = React.useCallback(async () => {
         setIsLoading(true);
-        const offeringsData = await getOfferings();
-        setOfferings(offeringsData);
+        const servicesData = await getServices();
+        setServices(servicesData);
         setIsLoading(false);
     }, []);
 
     React.useEffect(() => {
-        fetchAndSetOfferings();
-    }, [fetchAndSetOfferings]);
+        fetchAndSetServices();
+    }, [fetchAndSetServices]);
     
     const handleDelete = async (id: string) => {
-        const result = await deleteOffering(id);
+        const result = await deleteService(id);
         if (result.success) {
             toast({ title: "Deleted!", description: result.message });
-            await fetchAndSetOfferings();
+            await fetchAndSetServices();
         } else {
             toast({ variant: "destructive", title: "Error", description: result.message });
         }
     };
     
     const onSave = async () => {
-      await fetchAndSetOfferings();
+      await fetchAndSetServices();
     };
 
     if (isLoading) {
         return (
              <Card>
                 <CardHeader>
-                    <CardTitle>Manage Core Offerings</CardTitle>
-                    <CardDescription>Add, edit, or remove the core offerings displayed on your homepage.</CardDescription>
+                    <CardTitle>Manage Core Services</CardTitle>
+                    <CardDescription>Add, edit, or remove the core services displayed on your site.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-center justify-center p-12">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -171,29 +228,29 @@ export function OfferingsManager() {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle>Manage Core Offerings</CardTitle>
-                    <CardDescription>Add, edit, or remove offerings from your homepage.</CardDescription>
+                    <CardTitle>Manage Core Services</CardTitle>
+                    <CardDescription>Add, edit, or remove services from your site.</CardDescription>
                 </div>
-                <OfferingFormDialog
-                    trigger={<Button><PlusCircle className="mr-2" /> Add Offering</Button>}
+                <ServiceFormDialog
+                    trigger={<Button><PlusCircle className="mr-2" /> Add Service</Button>}
                     onSave={onSave}
                 />
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
-                    {offerings.map(offering => (
-                        <div key={offering.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    {services.map(service => (
+                        <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg">
                             <div className="flex items-center gap-4">
-                                <DynamicIcon name={offering.icon} />
+                                <DynamicIcon name={service.iconName} />
                                 <div>
-                                    <h3 className="font-semibold">{offering.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{offering.description}</p>
+                                    <h3 className="font-semibold">{service.title}</h3>
+                                    <p className="text-sm text-muted-foreground">{service.description}</p>
                                 </div>
                             </div>
                             <div className="flex gap-2">
-                                <OfferingFormDialog
+                                <ServiceFormDialog
                                     trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
-                                    offering={offering}
+                                    service={service}
                                     onSave={onSave}
                                 />
                                 <AlertDialog>
@@ -203,11 +260,11 @@ export function OfferingsManager() {
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
                                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>This action cannot be undone. This will permanently delete the offering.</AlertDialogDescription>
+                                            <AlertDialogDescription>This action cannot be undone. This will permanently delete the service.</AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(offering.id)}>Delete</AlertDialogAction>
+                                            <AlertDialogAction onClick={() => handleDelete(service.id)}>Delete</AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>
