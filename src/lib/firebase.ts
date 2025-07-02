@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import { getFirestore, type Firestore, initializeFirestore, memoryLocalCache } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,7 +26,17 @@ if (isFirebaseConfigured) {
   try {
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
-    db = getFirestore(app);
+    // In a server-side environment, we need to use in-memory cache
+    // to avoid issues with IndexedDB persistence not being available.
+    // We try to initialize it, but if it fails (e.g. already initialized in dev with HMR),
+    // we fall back to getting the existing instance.
+    try {
+      db = initializeFirestore(app, {
+        localCache: memoryLocalCache(),
+      });
+    } catch(error) {
+        db = getFirestore(app);
+    }
   } catch(e) {
     console.error("Failed to initialize Firebase", e);
   }
