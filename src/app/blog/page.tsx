@@ -4,38 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { generateBlogPosts } from '@/ai/flows/blog-posts-flow';
 
-const posts = [
-  {
-    title: "The Rise of AI in African SMEs: Opportunities and Challenges",
-    author: "Dr. Evelyn K.",
-    date: "October 26, 2023",
-    category: "AI/ML",
-    image: "https://placehold.co/600x400.png",
-    hint: "artificial intelligence africa",
-    excerpt: "Exploring how artificial intelligence is reshaping the small and medium-sized enterprise landscape in Africa, and what businesses need to do to adapt."
-  },
-  {
-    title: "Why Your Next Project Should Be Built with Next.js",
-    author: "David L.",
-    date: "October 22, 2023",
-    category: "Web Development",
-    image: "https://placehold.co/600x400.png",
-    hint: "web development code",
-    excerpt: "A deep dive into the benefits of Next.js for modern web applications, from performance to developer experience."
-  },
-  {
-    title: "Fostering Tech Talent: A Look at Zambia's Growing Developer Ecosystem",
-    author: "Maria S.",
-    date: "October 18, 2023",
-    category: "Tech in Africa",
-    image: "https://placehold.co/600x400.png",
-    hint: "zambia landscape students",
-    excerpt: "An analysis of the burgeoning tech scene in Zambia, highlighting key players, educational initiatives, and future outlook."
-  },
-];
+export default async function BlogPage() {
+  const { posts } = await generateBlogPosts({ topic: "The future of technology in Africa" });
 
-export default function BlogPage() {
   return (
     <div className="container py-16 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
