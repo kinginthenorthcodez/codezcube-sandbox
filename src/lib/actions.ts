@@ -52,41 +52,19 @@ export async function updateHomepageStats(stats: HomepageStats): Promise<{ succe
   }
 }
 
-const defaultServices: Omit<Service, 'id'>[] = [
-    {
-        slug: "ai-ml-solutions",
-        title: "AI/ML Solutions",
-        description: "Leveraging Artificial Intelligence and Machine Learning to unlock insights, automate processes, and create intelligent products.",
-        details: "Our AI/ML solutions are designed to help your business harness the power of data. We build custom models and integrate intelligent algorithms to solve complex problems, from predictive analytics to natural language processing. Let us help you transform your data into a competitive advantage.",
-        features: [ "Custom Machine Learning Model Development", "Natural Language Processing (NLP)", "Predictive Analytics & Forecasting", "Computer Vision Solutions" ],
-        iconName: "BrainCircuit",
-        imageUrl: "https://placehold.co/600x400.png",
-        imageStoragePath: "",
-        order: 1
-    },
-];
-
 export async function getServices(): Promise<Service[]> {
   if (!db) {
-    console.warn('Firestore is not initialized. Serving default services.');
-    return defaultServices.map((o, i) => ({ ...o, id: `default-${i}` }));
+    console.warn('Firestore is not initialized. Serving empty services array.');
+    return [];
   }
   try {
     const servicesCol = collection(db, 'services');
     const q = query(servicesCol, orderBy('order'));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      console.log('No services found, seeding with default data.');
-      for (const service of defaultServices) {
-        await addDoc(collection(db, 'services'), service);
-      }
-      const seededSnapshot = await getDocs(q);
-      return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Service));
-    }
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Service));
   } catch (error) {
     console.error('Error fetching services:', error);
-    return defaultServices.map((o, i) => ({ ...o, id: `default-${i}` }));
+    return [];
   }
 }
 
@@ -215,30 +193,19 @@ export async function deleteService(id: string): Promise<{ success: boolean; mes
     }
 }
 
-const defaultClients: Omit<Client, 'id'>[] = [
-  { name: 'Innovate Inc.', logoUrl: 'https://placehold.co/150x60.png', logoStoragePath: '', dataAiHint: 'tech company' },
-];
-
 export async function getClients(): Promise<Client[]> {
   if (!db) {
-    return defaultClients.map((c, i) => ({ ...c, id: `default-${i}` }));
+    console.warn('Firestore is not initialized. Serving empty clients array.');
+    return [];
   }
   try {
     const clientsCol = collection(db, 'clients');
     const q = query(clientsCol, orderBy('name'));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      console.log('No clients found, seeding with default data.');
-      for (const client of defaultClients) {
-        await addDoc(collection(db, 'clients'), client);
-      }
-      const seededSnapshot = await getDocs(q);
-      return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client));
-    }
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client));
   } catch (error) {
     console.error('Error fetching clients:', error);
-    return defaultClients.map((c, i) => ({ ...c, id: `default-${i}` }));
+    return [];
   }
 }
 
@@ -319,37 +286,19 @@ export async function deleteClient(id: string): Promise<{ success: boolean; mess
     }
 }
 
-const defaultTestimonials: Omit<Testimonial, 'id'>[] = [
-  {
-    quote: "Working with Codezcube was a game-changer for our organization. Their team is not only technically proficient but also deeply committed to our success. They delivered beyond our expectations.",
-    authorName: "Jane Doe",
-    authorTitle: "CEO, Acme Inc.",
-    avatarUrl: "https://github.com/shadcn.png",
-    avatarStoragePath: "",
-    rating: 5,
-  },
-];
-
 export async function getTestimonials(): Promise<Testimonial[]> {
   if (!db) {
-    return defaultTestimonials.map((t, i) => ({ ...t, id: `default-${i}` }));
+    console.warn('Firestore is not initialized. Serving empty testimonials array.');
+    return [];
   }
   try {
     const testimonialsCol = collection(db, 'testimonials');
     const q = query(testimonialsCol, orderBy('authorName'));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      console.log('No testimonials found, seeding with default data.');
-      for (const testimonial of defaultTestimonials) {
-        await addDoc(collection(db, 'testimonials'), testimonial);
-      }
-      const seededSnapshot = await getDocs(q);
-      return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
-    }
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
   } catch (error) {
     console.error('Error fetching testimonials:', error);
-    return defaultTestimonials.map((t, i) => ({ ...t, id: `default-${i}` }));
+    return [];
   }
 }
 
@@ -542,35 +491,6 @@ export async function updateSiteConfiguration(config: SiteConfiguration): Promis
 }
 
 // Portfolio Project Actions
-const defaultPortfolioProjects: Omit<PortfolioProject, 'id'>[] = [
-    {
-        slug: "ecommerce-platform-revamp",
-        title: "E-commerce Platform Revamp",
-        category: "Web Development",
-        description: "A complete overhaul of a leading online retailer's platform to enhance user experience and improve performance.",
-        tags: ["Next.js", "Firebase", "E-commerce", "UX/UI Design"],
-        imageUrl: "https://placehold.co/600x400.png",
-        imageStoragePath: "",
-        order: 1,
-        problemStatement: "We partnered with a major e-commerce brand to redesign and rebuild their online platform from the ground up. The project involved migrating to a modern tech stack (Next.js, Firebase), implementing a new design system for a responsive user interface, and optimizing the backend for faster load times and scalability. The new platform resulted in a 40% increase in conversion rates and a 60% improvement in page load speed.",
-        targetAudience: "This section will detail the target audience for the project and the strategic approach taken to meet their needs.",
-        myRole: "This section will describe my specific role and responsibilities throughout the project lifecycle.",
-        designThinkingProcess: "This section provides an overview of the design thinking methodology applied to this project.",
-        projectTimeline: "A summary of the project timeline and key milestones.",
-        qualitativeResearch: "Details about the qualitative research methods used, such as user interviews and observations.",
-        quantitativeResearch: "Details about quantitative research methods like surveys and analytics review.",
-        userPersona: "A detailed user persona developed from the research findings.",
-        empathyMap: "An empathy map to visualize user attitudes and behaviors.",
-        taskFlow: "Diagrams or descriptions of the primary user task flows.",
-        cardSorting: "Information on how card sorting was used to inform the information architecture.",
-        informationArchitecture: "The resulting information architecture for the application.",
-        highFidelityPrototypes: "Showcase of the high-fidelity prototypes created for user testing.",
-        typographyAndColors: "The typography choices and color palette defined for the project.",
-        visualDesigns: "Final visual designs and key screens of the application.",
-        thankYouNote: "Thank you for reviewing this case study. I hope it provided valuable insight into my process and capabilities. Feel free to reach out with any questions!"
-    },
-];
-
 const mapDocToProject = (doc: QueryDocumentSnapshot | DocumentSnapshot): PortfolioProject => {
     const data = doc.data() || {};
     return {
@@ -605,25 +525,17 @@ const mapDocToProject = (doc: QueryDocumentSnapshot | DocumentSnapshot): Portfol
 
 export async function getPortfolioProjects(): Promise<PortfolioProject[]> {
     if (!db) {
-        console.warn('Firestore is not initialized. Serving default projects.');
-        return defaultPortfolioProjects.map((p, i) => ({ ...p, id: `default-${i}` }));
+        console.warn('Firestore is not initialized. Serving empty portfolio array.');
+        return [];
     }
     try {
         const projectsCol = collection(db, 'portfolio');
         const q = query(projectsCol, orderBy('order'));
         const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-            console.log('No portfolio projects found, seeding with default data.');
-            for (const project of defaultPortfolioProjects) {
-                await addDoc(collection(db, 'portfolio'), project);
-            }
-            const seededSnapshot = await getDocs(q);
-            return seededSnapshot.docs.map(mapDocToProject);
-        }
         return querySnapshot.docs.map(mapDocToProject);
     } catch (error) {
         console.error('Error fetching portfolio projects:', error);
-        return defaultPortfolioProjects.map((p, i) => ({ ...p, id: `default-${i}` }));
+        return [];
     }
 }
 
@@ -760,38 +672,18 @@ export async function deletePortfolioProject(id: string): Promise<{ success: boo
 
 // Product Actions
 export async function getProducts(): Promise<Product[]> {
-    const defaultProducts: Omit<Product, 'id'>[] = [
-        {
-            title: "CodezCube Learn",
-            description: "An interactive e-learning platform designed to make technology education accessible and engaging for students across Africa.",
-            category: "EdTech",
-            imageUrl: "https://placehold.co/600x400.png",
-            imageStoragePath: "",
-            productUrl: "#",
-            order: 1
-        },
-    ];
-
     if (!db) {
-        console.warn('Firestore is not initialized. Serving default products.');
-        return defaultProducts.map((p, i) => ({ ...p, id: `default-${i}` }));
+        console.warn('Firestore is not initialized. Serving empty products array.');
+        return [];
     }
     try {
         const productsCol = collection(db, 'products');
         const q = query(productsCol, orderBy('order'));
         const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-            console.log('No products found, seeding with default data.');
-            for (const product of defaultProducts) {
-                await addDoc(collection(db, 'products'), product);
-            }
-            const seededSnapshot = await getDocs(q);
-            return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
-        }
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
     } catch (error) {
         console.error('Error fetching products:', error);
-        return defaultProducts.map((p, i) => ({ ...p, id: `default-${i}` }));
+        return [];
     }
 }
 
