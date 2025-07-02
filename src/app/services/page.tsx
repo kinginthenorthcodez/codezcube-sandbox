@@ -24,12 +24,12 @@ export default async function ServicesPage() {
                         </div>
                         <div className="flex items-center justify-center">
                             <Image
-                                src="https://placehold.co/600x400.png"
+                                src="https://firebasestorage.googleapis.com/v0/b/codezcube-sandbox.firebasestorage.app/o/images%2Fundraw_voice-interface_vo02.svg?alt=media&token=445f18ea-f5b9-4c40-a11c-1241e54d5aa7"
                                 width={600}
                                 height={400}
                                 alt="Expert Services"
                                 className="mx-auto overflow-hidden rounded-xl object-cover object-center"
-                                data-ai-hint="woman user interface"
+                                data-ai-hint="voice interface"
                             />
                         </div>
                     </div>
