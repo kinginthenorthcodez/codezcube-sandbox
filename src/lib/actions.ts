@@ -1,6 +1,7 @@
+
 'use server';
 
-import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, where, limit } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, where, limit, type DocumentSnapshot, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
@@ -546,13 +547,60 @@ const defaultPortfolioProjects: Omit<PortfolioProject, 'id'>[] = [
         title: "E-commerce Platform Revamp",
         category: "Web Development",
         description: "A complete overhaul of a leading online retailer's platform to enhance user experience and improve performance.",
-        details: "We partnered with a major e-commerce brand to redesign and rebuild their online platform from the ground up. The project involved migrating to a modern tech stack (Next.js, Firebase), implementing a new design system for a responsive user interface, and optimizing the backend for faster load times and scalability. The new platform resulted in a 40% increase in conversion rates and a 60% improvement in page load speed.",
         tags: ["Next.js", "Firebase", "E-commerce", "UX/UI Design"],
         imageUrl: "https://placehold.co/600x400.png",
         imageStoragePath: "",
-        order: 1
+        order: 1,
+        problemStatement: "We partnered with a major e-commerce brand to redesign and rebuild their online platform from the ground up. The project involved migrating to a modern tech stack (Next.js, Firebase), implementing a new design system for a responsive user interface, and optimizing the backend for faster load times and scalability. The new platform resulted in a 40% increase in conversion rates and a 60% improvement in page load speed.",
+        targetAudience: "This section will detail the target audience for the project and the strategic approach taken to meet their needs.",
+        myRole: "This section will describe my specific role and responsibilities throughout the project lifecycle.",
+        designThinkingProcess: "This section provides an overview of the design thinking methodology applied to this project.",
+        projectTimeline: "A summary of the project timeline and key milestones.",
+        qualitativeResearch: "Details about the qualitative research methods used, such as user interviews and observations.",
+        quantitativeResearch: "Details about quantitative research methods like surveys and analytics review.",
+        userPersona: "A detailed user persona developed from the research findings.",
+        empathyMap: "An empathy map to visualize user attitudes and behaviors.",
+        taskFlow: "Diagrams or descriptions of the primary user task flows.",
+        cardSorting: "Information on how card sorting was used to inform the information architecture.",
+        informationArchitecture: "The resulting information architecture for the application.",
+        highFidelityPrototypes: "Showcase of the high-fidelity prototypes created for user testing.",
+        typographyAndColors: "The typography choices and color palette defined for the project.",
+        visualDesigns: "Final visual designs and key screens of the application.",
+        thankYouNote: "Thank you for reviewing this case study. I hope it provided valuable insight into my process and capabilities. Feel free to reach out with any questions!"
     },
 ];
+
+const mapDocToProject = (doc: QueryDocumentSnapshot | DocumentSnapshot): PortfolioProject => {
+    const data = doc.data() || {};
+    return {
+        id: doc.id,
+        slug: data.slug || '',
+        title: data.title || '',
+        category: data.category || '',
+        description: data.description || '',
+        tags: data.tags || [],
+        imageUrl: data.imageUrl || '',
+        imageStoragePath: data.imageStoragePath || '',
+        order: data.order || 0,
+        problemStatement: data.problemStatement || data.details || '', // backward compatibility
+        targetAudience: data.targetAudience || '',
+        myRole: data.myRole || '',
+        designThinkingProcess: data.designThinkingProcess || '',
+        projectTimeline: data.projectTimeline || '',
+        qualitativeResearch: data.qualitativeResearch || '',
+        quantitativeResearch: data.quantitativeResearch || '',
+        userPersona: data.userPersona || '',
+        empathyMap: data.empathyMap || '',
+        taskFlow: data.taskFlow || '',
+        cardSorting: data.cardSorting || '',
+        informationArchitecture: data.informationArchitecture || '',
+        highFidelityPrototypes: data.highFidelityPrototypes || '',
+        typographyAndColors: data.typographyAndColors || '',
+        visualDesigns: data.visualDesigns || '',
+        thankYouNote: data.thankYouNote || '',
+    };
+};
+
 
 export async function getPortfolioProjects(): Promise<PortfolioProject[]> {
     if (!db) {
@@ -569,9 +617,9 @@ export async function getPortfolioProjects(): Promise<PortfolioProject[]> {
                 await addDoc(collection(db, 'portfolio'), project);
             }
             const seededSnapshot = await getDocs(q);
-            return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioProject));
+            return seededSnapshot.docs.map(mapDocToProject);
         }
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PortfolioProject));
+        return querySnapshot.docs.map(mapDocToProject);
     } catch (error) {
         console.error('Error fetching portfolio projects:', error);
         return defaultPortfolioProjects.map((p, i) => ({ ...p, id: `default-${i}` }));
@@ -584,8 +632,7 @@ export async function getPortfolioProjectBySlug(slug: string): Promise<Portfolio
         const q = query(collection(db, 'portfolio'), where("slug", "==", slug), limit(1));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) return null;
-        const doc = querySnapshot.docs[0];
-        return { id: doc.id, ...doc.data() } as PortfolioProject;
+        return mapDocToProject(querySnapshot.docs[0]);
     } catch (error) {
         console.error('Error fetching portfolio project by slug:', error);
         return null;
@@ -607,11 +654,26 @@ export async function addPortfolioProject(formData: FormData): Promise<{ success
             slug: formData.get('slug') as string,
             category: formData.get('category') as string,
             description: formData.get('description') as string,
-            details: formData.get('details') as string,
             tags: (formData.get('tags') as string).split('\n').map(t => t.trim()).filter(t => t),
             order: Number(formData.get('order')),
             imageUrl: url,
             imageStoragePath: storagePath,
+            problemStatement: formData.get('problemStatement') as string,
+            targetAudience: formData.get('targetAudience') as string,
+            myRole: formData.get('myRole') as string,
+            designThinkingProcess: formData.get('designThinkingProcess') as string,
+            projectTimeline: formData.get('projectTimeline') as string,
+            qualitativeResearch: formData.get('qualitativeResearch') as string,
+            quantitativeResearch: formData.get('quantitativeResearch') as string,
+            userPersona: formData.get('userPersona') as string,
+            empathyMap: formData.get('empathyMap') as string,
+            taskFlow: formData.get('taskFlow') as string,
+            cardSorting: formData.get('cardSorting') as string,
+            informationArchitecture: formData.get('informationArchitecture') as string,
+            highFidelityPrototypes: formData.get('highFidelityPrototypes') as string,
+            typographyAndColors: formData.get('typographyAndColors') as string,
+            visualDesigns: formData.get('visualDesigns') as string,
+            thankYouNote: formData.get('thankYouNote') as string,
         };
 
         await addDoc(collection(db, 'portfolio'), newProject);
@@ -638,9 +700,24 @@ export async function updatePortfolioProject(id: string, formData: FormData): Pr
             slug: formData.get('slug') as string,
             category: formData.get('category') as string,
             description: formData.get('description') as string,
-            details: formData.get('details') as string,
             tags: (formData.get('tags') as string).split('\n').map(t => t.trim()).filter(t => t),
             order: Number(formData.get('order')),
+            problemStatement: formData.get('problemStatement') as string,
+            targetAudience: formData.get('targetAudience') as string,
+            myRole: formData.get('myRole') as string,
+            designThinkingProcess: formData.get('designThinkingProcess') as string,
+            projectTimeline: formData.get('projectTimeline') as string,
+            qualitativeResearch: formData.get('qualitativeResearch') as string,
+            quantitativeResearch: formData.get('quantitativeResearch') as string,
+            userPersona: formData.get('userPersona') as string,
+            empathyMap: formData.get('empathyMap') as string,
+            taskFlow: formData.get('taskFlow') as string,
+            cardSorting: formData.get('cardSorting') as string,
+            informationArchitecture: formData.get('informationArchitecture') as string,
+            highFidelityPrototypes: formData.get('highFidelityPrototypes') as string,
+            typographyAndColors: formData.get('typographyAndColors') as string,
+            visualDesigns: formData.get('visualDesigns') as string,
+            thankYouNote: formData.get('thankYouNote') as string,
         };
 
         const imageFile = formData.get('imageFile') as File;

@@ -1,3 +1,4 @@
+
 export type HomepageStats = {
   projectsCompleted: string;
   clientSatisfaction: string;
@@ -23,12 +24,30 @@ export type PortfolioProject = {
   title: string;
   category: string;
   description: string; // Short description for list/card view
-  details: string; // Full case study content for detail page
   tags: string[];
   imageUrl: string;
   imageStoragePath: string;
   order: number;
+  
+  // Case Study fields
+  problemStatement: string;
+  targetAudience: string;
+  myRole: string;
+  designThinkingProcess: string;
+  projectTimeline: string;
+  qualitativeResearch: string;
+  quantitativeResearch: string;
+  userPersona: string;
+  empathyMap: string;
+  taskFlow: string;
+  cardSorting: string;
+  informationArchitecture: string;
+  highFidelityPrototypes: string;
+  typographyAndColors: string;
+  visualDesigns: string;
+  thankYouNote: string;
 };
+
 
 export type Client = {
   id:string;

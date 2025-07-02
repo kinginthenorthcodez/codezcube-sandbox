@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -17,6 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
+import { Separator } from "@/components/ui/separator";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/svg+xml"];
@@ -26,13 +28,28 @@ const projectSchema = z.object({
     slug: z.string().min(3, "Slug must be at least 3 characters.").regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens."),
     category: z.string().min(3, "Category is required."),
     description: z.string().min(10, "Short description must be at least 10 characters."),
-    details: z.string().min(20, "Detailed description must be at least 20 characters."),
     tags: z.string().min(1, "Please provide at least one tag."),
     order: z.coerce.number().int().min(0),
     imageFile: z.any()
         .optional()
         .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
         .refine((files) => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), "Only .jpg, .jpeg, .png, .svg and .webp formats are supported."),
+    problemStatement: z.string().optional(),
+    targetAudience: z.string().optional(),
+    myRole: z.string().optional(),
+    designThinkingProcess: z.string().optional(),
+    projectTimeline: z.string().optional(),
+    qualitativeResearch: z.string().optional(),
+    quantitativeResearch: z.string().optional(),
+    userPersona: z.string().optional(),
+    empathyMap: z.string().optional(),
+    taskFlow: z.string().optional(),
+    cardSorting: z.string().optional(),
+    informationArchitecture: z.string().optional(),
+    highFidelityPrototypes: z.string().optional(),
+    typographyAndColors: z.string().optional(),
+    visualDesigns: z.string().optional(),
+    thankYouNote: z.string().optional(),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -50,11 +67,25 @@ function ProjectFormDialog({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const defaultValues = React.useMemo(() => (
-    project
-      ? { ...project, tags: project.tags.join('\n'), imageFile: undefined }
-      : { title: "", slug: "", category: "", description: "", details: "", tags: "", order: 0, imageFile: undefined }
-  ), [project]);
+  const defaultValues = React.useMemo(() => {
+    const baseProject = {
+      title: "", slug: "", category: "", description: "", tags: "", order: 0, imageFile: undefined,
+      problemStatement: "", targetAudience: "", myRole: "", designThinkingProcess: "", projectTimeline: "",
+      qualitativeResearch: "", quantitativeResearch: "", userPersona: "", empathyMap: "", taskFlow: "",
+      cardSorting: "", informationArchitecture: "", highFidelityPrototypes: "", typographyAndColors: "",
+      visualDesigns: "", thankYouNote: ""
+    };
+
+    if (project) {
+        return {
+            ...baseProject,
+            ...project,
+            tags: project.tags.join('\n'),
+            imageFile: undefined,
+        };
+    }
+    return baseProject;
+  }, [project]);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -103,14 +134,15 @@ function ProjectFormDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>{project ? 'Edit Project' : 'Add New Project'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <ScrollArea className="h-[60vh] pr-6">
+            <ScrollArea className="h-[70vh] pr-6">
             <div className="space-y-4 py-4">
+              <h3 className="text-lg font-semibold">Project Overview</h3>
               <FormField control={form.control} name="title" render={({ field }) => (
                 <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
               )} />
@@ -122,9 +154,6 @@ function ProjectFormDialog({
               )} />
               <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem><FormLabel>Short Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormDesc>A brief summary for the portfolio grid.</FormDesc><FormMessage /></FormItem>
-              )} />
-              <FormField control={form.control} name="details" render={({ field }) => (
-                <FormItem><FormLabel>Detailed Case Study</FormLabel><FormControl><Textarea className="min-h-[150px]" {...field} /></FormControl><FormDesc>The full content for the project detail page. Use two newlines for paragraphs.</FormDesc><FormMessage /></FormItem>
               )} />
               <FormField
                 control={form.control}
@@ -155,6 +184,59 @@ function ProjectFormDialog({
               <FormField control={form.control} name="order" render={({ field }) => (
                 <FormItem><FormLabel>Order</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormDesc>The display order on the portfolio page.</FormDesc><FormMessage /></FormItem>
               )} />
+              
+              <Separator className="my-8" />
+              <h3 className="text-lg font-semibold">Case Study Details</h3>
+              
+              <FormField control={form.control} name="problemStatement" render={({ field }) => (
+                <FormItem><FormLabel>Problem Statement & Possible Solution</FormLabel><FormControl><Textarea className="min-h-[150px]" {...field} /></FormControl><FormDesc>The full content for the project detail page. Use two newlines for paragraphs.</FormDesc><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="targetAudience" render={({ field }) => (
+                <FormItem><FormLabel>Target Audience & The Approach</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="myRole" render={({ field }) => (
+                <FormItem><FormLabel>My Role</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="designThinkingProcess" render={({ field }) => (
+                <FormItem><FormLabel>Design Thinking Process Overview</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="projectTimeline" render={({ field }) => (
+                <FormItem><FormLabel>Project Timeline</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="qualitativeResearch" render={({ field }) => (
+                <FormItem><FormLabel>Qualitative Research</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="quantitativeResearch" render={({ field }) => (
+                <FormItem><FormLabel>Quantitative Research</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="userPersona" render={({ field }) => (
+                <FormItem><FormLabel>User Persona</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="empathyMap" render={({ field }) => (
+                <FormItem><FormLabel>Empathy Map</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="taskFlow" render={({ field }) => (
+                <FormItem><FormLabel>Task Flow</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="cardSorting" render={({ field }) => (
+                <FormItem><FormLabel>Card Sorting</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+               <FormField control={form.control} name="informationArchitecture" render={({ field }) => (
+                <FormItem><FormLabel>Information Architecture</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="highFidelityPrototypes" render={({ field }) => (
+                <FormItem><FormLabel>High-Fidelity Prototypes</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="typographyAndColors" render={({ field }) => (
+                <FormItem><FormLabel>Typography & Colors</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="visualDesigns" render={({ field }) => (
+                <FormItem><FormLabel>Visual Designs</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="thankYouNote" render={({ field }) => (
+                <FormItem><FormLabel>Thank You Note</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+
             </div>
             </ScrollArea>
             <DialogFooter className="mt-6 pt-4 border-t">

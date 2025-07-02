@@ -1,3 +1,4 @@
+
 import { getPortfolioProjectBySlug, getPortfolioProjects } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Users, Clock, Target, PenTool, Brain, Search, Map, Bot, Palette, MonitorPlay, ThumbsUp, Clapperboard, Type, Microscope, BookUser, Workflow, Shuffle, Network, Lightbulb, BarChartBig } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import React from "react";
 
 // Reusable component for timeline items
@@ -20,7 +20,10 @@ const TimelineItem = ({ title, icon, children, isLast = false }: { title: string
         <div id={title.toLowerCase().replace(/ /g, '-')} className="flex-1 pb-12 pt-2">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">{title}</h2>
             <div className="prose prose-lg text-muted-foreground max-w-none">
-                {children}
+                {typeof children === 'string' 
+                    ? children.split('\n').filter(p => p.trim() !== '').map((paragraph, i) => <p key={i}>{paragraph}</p>)
+                    : children
+                }
             </div>
         </div>
     </div>
@@ -35,7 +38,12 @@ const TimelineSubSection = ({ title, icon, children }: { title: string; icon: Re
             </div>
             <h3 className="text-xl font-semibold text-foreground">{title}</h3>
         </div>
-        <div className="text-base">{children}</div>
+        <div className="text-base">
+            {typeof children === 'string' 
+                ? children.split('\n').filter(p => p.trim() !== '').map((paragraph, i) => <p key={i}>{paragraph}</p>)
+                : children
+            }
+        </div>
     </div>
 );
 
@@ -85,53 +93,53 @@ export default async function PortfolioDetailPage({ params }: { params: { slug: 
                         </TimelineItem>
 
                         <TimelineItem title="Problem Statement & Possible Solution" icon={<Target />}>
-                            {project.details.split('\n').filter(p => p.trim() !== '').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+                           {project.problemStatement}
                         </TimelineItem>
 
                         <TimelineItem title="Target Audience & The Approach" icon={<Users />}>
-                            <p>This section will detail the target audience for the project and the strategic approach taken to meet their needs. [Placeholder content]</p>
+                           {project.targetAudience}
                         </TimelineItem>
 
                         <TimelineItem title="My Role" icon={<PenTool />}>
-                             <p>This section will describe my specific role and responsibilities throughout the project lifecycle. [Placeholder content]</p>
+                           {project.myRole}
                         </TimelineItem>
 
                         <TimelineItem title="Design Thinking Process" icon={<Brain />}>
-                             <p>This section provides an overview of the design thinking methodology applied to this project. [Placeholder content]</p>
+                           {project.designThinkingProcess}
                         </TimelineItem>
 
                         <TimelineItem title="Project Timeline" icon={<Clock />}>
-                            <p>A summary of the project timeline and key milestones. [Placeholder content]</p>
+                            {project.projectTimeline}
                         </TimelineItem>
 
                         <TimelineItem title="Empathize Phase" icon={<Search />}>
                             <p>In this phase, we focused on understanding the user's needs, motivations, and pain points through various research methods.</p>
                             <TimelineSubSection title="Qualitative Research" icon={<Microscope className="h-5 w-5"/>}>
-                                <p>Details about the qualitative research methods used, such as user interviews and observations. [Placeholder content]</p>
+                                {project.qualitativeResearch}
                             </TimelineSubSection>
                             <TimelineSubSection title="Quantitative Research" icon={<BarChartBig className="h-5 w-5"/>}>
-                                <p>Details about quantitative research methods like surveys and analytics review. [Placeholder content]</p>
+                                {project.quantitativeResearch}
                             </TimelineSubSection>
                         </TimelineItem>
 
                         <TimelineItem title="Define Phase" icon={<Lightbulb />}>
-                             <p>Here, we synthesized our research findings to articulate the core user problems and define clear project goals.</p>
-                            <TimelineSubSection title="User Persona" icon={<BookUser className="h-5 w-5"/>}><p>A detailed user persona developed from the research findings. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Empathy Map" icon={<Map className="h-5 w-5"/>}><p>An empathy map to visualize user attitudes and behaviors. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Task Flow" icon={<Workflow className="h-5 w-5"/>}><p>Diagrams or descriptions of the primary user task flows. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Card Sorting" icon={<Shuffle className="h-5 w-5"/>}><p>Information on how card sorting was used to inform the information architecture. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Information Architecture" icon={<Network className="h-5 w-5"/>}><p>The resulting information architecture for the application. [Placeholder content]</p></TimelineSubSection>
+                            <p>Here, we synthesized our research findings to articulate the core user problems and define clear project goals.</p>
+                            <TimelineSubSection title="User Persona" icon={<BookUser className="h-5 w-5"/>}>{project.userPersona}</TimelineSubSection>
+                            <TimelineSubSection title="Empathy Map" icon={<Map className="h-5 w-5"/>}>{project.empathyMap}</TimelineSubSection>
+                            <TimelineSubSection title="Task Flow" icon={<Workflow className="h-5 w-5"/>}>{project.taskFlow}</TimelineSubSection>
+                            <TimelineSubSection title="Card Sorting" icon={<Shuffle className="h-5 w-5"/>}>{project.cardSorting}</TimelineSubSection>
+                            <TimelineSubSection title="Information Architecture" icon={<Network className="h-5 w-5"/>}>{project.informationArchitecture}</TimelineSubSection>
                         </TimelineItem>
 
                         <TimelineItem title="Design Phase" icon={<Palette />}>
                             <p>This phase involved creating the visual and interactive elements of the product, from initial sketches to high-fidelity, polished designs.</p>
-                            <TimelineSubSection title="High-Fidelity Prototypes" icon={<MonitorPlay className="h-5 w-5"/>}><p>Showcase of the high-fidelity prototypes created for user testing. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Typography & Colors" icon={<Type className="h-5 w-5"/>}><p>The typography choices and color palette defined for the project. [Placeholder content]</p></TimelineSubSection>
-                            <TimelineSubSection title="Visual Designs" icon={<Clapperboard className="h-5 w-5"/>}><p>Final visual designs and key screens of the application. [Placeholder content]</p></TimelineSubSection>
+                            <TimelineSubSection title="High-Fidelity Prototypes" icon={<MonitorPlay className="h-5 w-5"/>}>{project.highFidelityPrototypes}</TimelineSubSection>
+                            <TimelineSubSection title="Typography & Colors" icon={<Type className="h-5 w-5"/>}>{project.typographyAndColors}</TimelineSubSection>
+                            <TimelineSubSection title="Visual Designs" icon={<Clapperboard className="h-5 w-5"/>}>{project.visualDesigns}</TimelineSubSection>
                         </TimelineItem>
 
                         <TimelineItem title="Thank You" icon={<ThumbsUp />} isLast={true}>
-                             <p>Thank you for reviewing this case study. I hope it provided valuable insight into my process and capabilities. Feel free to reach out with any questions!</p>
+                             {project.thankYouNote}
                         </TimelineItem>
                     </div>
                 </article>
