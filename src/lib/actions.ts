@@ -10,9 +10,9 @@ import { type HomepageStats, type Service, type Client, type Testimonial, type H
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
-    projectsCompleted: '50+',
-    clientSatisfaction: '98%',
-    yearsOfExperience: '5+',
+    projectsCompleted: '0',
+    clientSatisfaction: '0%',
+    yearsOfExperience: '0',
   };
 
   if (!db) {
@@ -410,7 +410,6 @@ export async function getHomepageContent(): Promise<HomepageContent> {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      // Deep merge with defaults to handle cases where new fields were added
       return {
           hero: { ...defaultContent.hero, ...data.hero },
           cta: { ...defaultContent.cta, ...data.cta },
@@ -501,7 +500,7 @@ const mapDocToProject = (doc: QueryDocumentSnapshot | DocumentSnapshot): Portfol
         imageUrl: data.imageUrl || '',
         imageStoragePath: data.imageStoragePath || '',
         order: data.order || 0,
-        problemStatement: data.problemStatement || data.details || '', // backward compatibility
+        problemStatement: data.problemStatement || data.details || '',
         targetAudience: data.targetAudience || '',
         myRole: data.myRole || '',
         designThinkingProcess: data.designThinkingProcess || '',
