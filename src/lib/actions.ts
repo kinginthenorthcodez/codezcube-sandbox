@@ -4,7 +4,7 @@ import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updat
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration } from '@/types';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -476,7 +476,7 @@ export async function getHomepageContent(): Promise<HomepageContent> {
 
 export async function updateHomepageContent(content: HomepageContent): Promise<{ success: boolean; message: string }> {
   if (!db) {
-    return { success: false, message: 'Firebase is not initialized.' };
+    return { success: false, message: 'Firestore is not initialized.' };
   }
   try {
     const docRef = doc(db, 'homepage', 'content');
@@ -488,5 +488,53 @@ export async function updateHomepageContent(content: HomepageContent): Promise<{
     console.error('Error updating content:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, message: `Failed to update content: ${errorMessage}` };
+  }
+}
+
+export async function getSiteConfiguration(): Promise<SiteConfiguration> {
+  const defaultSiteConfig: SiteConfiguration = {
+    socialLinks: {
+      github: '#',
+      twitter: '#',
+      linkedin: '#',
+    }
+  };
+
+  if (!db) {
+    console.warn('Firestore is not initialized. Serving default site config.');
+    return defaultSiteConfig;
+  }
+
+  try {
+    const docRef = doc(db, 'site', 'configuration');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return { socialLinks: { ...defaultSiteConfig.socialLinks, ...data.socialLinks } };
+    } else {
+      await setDoc(docRef, defaultSiteConfig);
+      return defaultSiteConfig;
+    }
+  } catch (error) {
+    console.error('Error fetching site configuration from Firestore.', error);
+    return defaultSiteConfig;
+  }
+}
+
+export async function updateSiteConfiguration(config: SiteConfiguration): Promise<{ success: boolean; message: string }> {
+  if (!db) {
+    return { success: false, message: 'Firestore is not initialized.' };
+  }
+  try {
+    const docRef = doc(db, 'site', 'configuration');
+    await setDoc(docRef, config, { merge: true });
+    revalidatePath('/');
+    revalidatePath('/admin/dashboard');
+    return { success: true, message: 'Site configuration updated successfully.' };
+  } catch (error) {
+    console.error('Error updating site config:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return { success: false, message: `Failed to update site config: ${errorMessage}` };
   }
 }

@@ -53,3 +53,13 @@ export type HomepageContent = {
   hero: HeroContent;
   cta: CtaContent;
 };
+
+export type SocialLinks = {
+  github: string;
+  twitter: string;
+  linkedin: string;
+};
+
+export type SiteConfiguration = {
+  socialLinks: SocialLinks;
+};

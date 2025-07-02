@@ -2,8 +2,12 @@ import { Logo } from "@/components/logo"
 import { Github, Linkedin, Twitter } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { getSiteConfiguration } from "@/lib/actions"
 
-export function Footer() {
+export async function Footer() {
+  const config = await getSiteConfiguration();
+  const { github, twitter, linkedin } = config.socialLinks;
+
   return (
     <footer className="border-t">
       <div className="container py-12">
@@ -15,17 +19,17 @@ export function Footer() {
             </p>
             <div className="flex gap-2">
               <Button variant="ghost" size="icon" asChild>
-                <Link href="#" aria-label="Github">
+                <Link href={github} aria-label="Github" target="_blank" rel="noopener noreferrer">
                   <Github className="h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="ghost" size="icon" asChild>
-                <Link href="#" aria-label="Twitter">
+                <Link href={twitter} aria-label="Twitter" target="_blank" rel="noopener noreferrer">
                   <Twitter className="h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="ghost" size="icon" asChild>
-                <Link href="#" aria-label="LinkedIn">
+                <Link href={linkedin} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
                   <Linkedin className="h-4 w-4" />
                 </Link>
               </Button>
