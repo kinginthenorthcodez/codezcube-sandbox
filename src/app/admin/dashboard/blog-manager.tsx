@@ -121,21 +121,102 @@ function PostFormDialog({
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <ScrollArea className="h-[70vh] pr-6">
                 <div className="space-y-4 py-4">
-                    <FormField control={form.control} name="title" render={({ field }) => (<FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="slug" render={({ field }) => (<FormItem><FormLabel>Slug</FormLabel><FormControl><Input placeholder="e.g. my-awesome-post" {...field} /></FormControl><FormDesc>A unique, URL-friendly identifier.</FormDesc><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="author" render={({ field }) => (<FormItem><FormLabel>Author</FormLabel><FormControl><Input placeholder="e.g. Jane Doe" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="category" render={({ field }) => (<FormItem><FormLabel>Category</FormLabel><FormControl><Input placeholder="e.g. Career Advice" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="imageFile" render={({ field }) => (
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="slug"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Slug</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. my-awesome-post" {...field} />
+                          </FormControl>
+                          <FormDesc>A unique, URL-friendly identifier.</FormDesc>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="author"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Author</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. Jane Doe" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. Career Advice" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="imageFile"
+                      render={({ field }) => (
                         <FormItem>
                             <FormLabel>Post Image</FormLabel>
                             {post?.imageUrl && (<div className="mb-2"><Image src={post.imageUrl} alt={post.title} width={200} height={100} className="rounded-md object-cover border p-2" /></div>)}
-                            <FormControl><Input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} onChange={(e) => field.onChange(e.target.files)} /></FormControl>
+                            <FormControl>
+                              <Input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} onChange={(e) => field.onChange(e.target.files)} />
+                            </FormControl>
                             <FormDesc>{post ? "Upload a new image to replace the current one." : "The main image for the post."}</FormDesc>
                             <FormMessage />
                         </FormItem>
                     )}
-                    <FormField control={form.control} name="excerpt" render={({ field }) => (<FormItem><FormLabel>Excerpt</FormLabel><FormControl><Textarea {...field} /></FormControl><FormDesc>A short summary for the blog list page.</FormDesc><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="content" render={({ field }) => (<FormItem><FormLabel>Full Content</FormLabel><FormControl><Textarea className="min-h-[300px]" {...field} /></FormControl><FormDesc>The main content of the blog post. Use two newlines for paragraphs.</FormDesc><FormMessage /></FormItem>)} />
+                    />
+                    <FormField
+                      control={form.control}
+                      name="excerpt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Excerpt</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} />
+                          </FormControl>
+                          <FormDesc>A short summary for the blog list page.</FormDesc>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="content"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Content</FormLabel>
+                          <FormControl>
+                            <Textarea className="min-h-[300px]" {...field} />
+                          </FormControl>
+                          <FormDesc>The main content of the blog post. Use two newlines for paragraphs.</FormDesc>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                 </div>
             </ScrollArea>
             <DialogFooter className="mt-6 pt-4 border-t">
@@ -254,3 +335,5 @@ export function BlogManager() {
         </Card>
     );
 }
+
+    
