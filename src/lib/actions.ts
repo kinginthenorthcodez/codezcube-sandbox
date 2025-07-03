@@ -728,12 +728,25 @@ export async function getCourses(): Promise<Course[]> {
     
     try {
         const coursesCol = collection(db, 'courses');
-        const q = query(coursesCol, orderBy('order'));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(coursesCol);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
     } catch (error) {
         console.error('Error fetching courses:', error);
         return [];
+    }
+}
+
+export async function getCourseBySlug(slug: string): Promise<Course | null> {
+    if (!db) return null;
+    try {
+        const q = query(collection(db, 'courses'), where("slug", "==", slug), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) return null;
+        const doc = querySnapshot.docs[0];
+        return { id: doc.id, ...doc.data() } as Course;
+    } catch (error) {
+        console.error('Error fetching course by slug:', error);
+        return null;
     }
 }
 
@@ -747,10 +760,12 @@ export async function addCourse(formData: FormData): Promise<{ success: boolean;
         const { url, storagePath } = await handleFileUpload(imageFile, 'course-images');
         const newCourse: Omit<Course, 'id'> = {
             title: formData.get('title') as string,
+            slug: formData.get('slug') as string,
             description: formData.get('description') as string,
-            category: formData.get('category') as string,
-            courseUrl: formData.get('courseUrl') as string,
-            order: Number(formData.get('order')),
+            level: formData.get('level') as string,
+            duration: formData.get('duration') as string,
+            modules: (formData.get('modules') as string).split('\n').map(m => m.trim()).filter(m => m),
+            dataAiHint: formData.get('dataAiHint') as string,
             imageUrl: url,
             imageStoragePath: storagePath,
         };
@@ -775,10 +790,12 @@ export async function updateCourse(id: string, formData: FormData): Promise<{ su
         const existingCourse = docSnap.data() as Course;
         const courseUpdate: Partial<Course> = {
             title: formData.get('title') as string,
+            slug: formData.get('slug') as string,
             description: formData.get('description') as string,
-            category: formData.get('category') as string,
-            courseUrl: formData.get('courseUrl') as string,
-            order: Number(formData.get('order')),
+            level: formData.get('level') as string,
+            duration: formData.get('duration') as string,
+            modules: (formData.get('modules') as string).split('\n').map(m => m.trim()).filter(m => m),
+            dataAiHint: formData.get('dataAiHint') as string,
         };
 
         const imageFile = formData.get('imageFile') as File;
@@ -792,6 +809,7 @@ export async function updateCourse(id: string, formData: FormData): Promise<{ su
         await updateDoc(docRef, courseUpdate);
         revalidatePath('/admin/dashboard');
         revalidatePath('/courses');
+        revalidatePath(`/courses/${courseUpdate.slug}`);
         return { success: true, message: 'Course updated successfully.' };
     } catch (error) {
         return { success: false, message: 'Failed to update course.' };

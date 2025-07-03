@@ -17,20 +17,23 @@ import { Loader2, PlusCircle, Trash, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Image from "next/image";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/svg+xml"];
 
 const courseSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters."),
+    slug: z.string().min(3, "Slug must be at least 3 characters.").regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens."),
     description: z.string().min(10, "Description must be at least 10 characters."),
-    category: z.string().min(2, "Category is required."),
-    courseUrl: z.string().url("Please enter a valid URL."),
-    order: z.coerce.number().int().min(0),
+    level: z.string().min(2, "Level is required."),
+    duration: z.string().min(2, "Duration is required."),
+    dataAiHint: z.string().min(2, "AI hint is required."),
+    modules: z.string().min(1, "Please provide at least one module."),
     imageFile: z.any()
         .optional()
         .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
-        .refine((files) => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), "Only .jpg, .jpeg, .png, and .webp formats are supported."),
+        .refine((files) => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), "Only .jpg, .jpeg, .png, .svg and .webp formats are supported."),
 });
 
 type CourseFormData = z.infer<typeof courseSchema>;
@@ -48,30 +51,22 @@ function CourseFormDialog({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
+  const defaultValues = React.useMemo(() => (
+    course 
+      ? { ...course, modules: course.modules.join('\n'), imageFile: undefined } 
+      : { title: "", slug: "", description: "", level: "", duration: "", dataAiHint: "", modules: "", imageFile: undefined }
+  ), [course]);
+
   const form = useForm<CourseFormData>({
     resolver: zodResolver(courseSchema),
-    defaultValues: {
-      title: course?.title || "",
-      description: course?.description || "",
-      category: course?.category || "",
-      courseUrl: course?.courseUrl || "",
-      order: course?.order || 0,
-      imageFile: undefined,
-    },
+    defaultValues
   });
 
   React.useEffect(() => {
     if (isOpen) {
-      form.reset({
-        title: course?.title || "",
-        description: course?.description || "",
-        category: course?.category || "",
-        courseUrl: course?.courseUrl || "",
-        order: course?.order || 0,
-        imageFile: undefined,
-      });
+      form.reset(defaultValues);
     }
-  }, [course, form, isOpen]);
+  }, [course, form, isOpen, defaultValues]);
 
   const handleSubmit = async (data: CourseFormData) => {
     setIsSubmitting(true);
@@ -109,51 +104,59 @@ function CourseFormDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>{course ? 'Edit Course' : 'Add New Course'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
-            <FormField control={form.control} name="title" render={({ field }) => (
-              <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
-             <FormField control={form.control} name="description" render={({ field }) => (
-              <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
-            <FormField control={form.control} name="category" render={({ field }) => (
-              <FormItem><FormLabel>Category</FormLabel><FormControl><Input placeholder="e.g. Web Development" {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
-            <FormField control={form.control} name="courseUrl" render={({ field }) => (
-                <FormItem><FormLabel>Course URL</FormLabel><FormControl><Input placeholder="https://example.com/course" {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
-             <FormField
-              control={form.control}
-              name="imageFile"
-              render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Course Image</FormLabel>
-                    {course?.imageUrl && (
-                        <div className="mb-2">
-                           <Image src={course.imageUrl} alt={course.title} width={200} height={100} className="rounded-md object-cover border p-2" />
-                        </div>
-                    )}
-                    <FormControl>
-                        <Input
-                            type="file"
-                            accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                            onChange={(e) => field.onChange(e.target.files)}
-                        />
-                    </FormControl>
-                    <FormDesc>{course ? "Upload a new image to replace the current one." : "The main image for the course."}</FormDesc>
-                    <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField control={form.control} name="order" render={({ field }) => (
-              <FormItem><FormLabel>Display Order</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormDesc>The order in which the course appears.</FormDesc><FormMessage /></FormItem>
-            )} />
-            <DialogFooter className="mt-4 pt-4 border-t">
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <ScrollArea className="h-[70vh] pr-6">
+                <div className="space-y-4 py-4">
+                  <FormField control={form.control} name="title" render={({ field }) => (
+                    <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                   <FormField control={form.control} name="slug" render={({ field }) => (
+                    <FormItem><FormLabel>Slug</FormLabel><FormControl><Input placeholder="e.g. intro-to-web-dev" {...field} /></FormControl><FormDesc>A unique, URL-friendly identifier.</FormDesc><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="description" render={({ field }) => (
+                    <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField control={form.control} name="level" render={({ field }) => (
+                      <FormItem><FormLabel>Level</FormLabel><FormControl><Input placeholder="e.g. Beginner" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name="duration" render={({ field }) => (
+                      <FormItem><FormLabel>Duration</FormLabel><FormControl><Input placeholder="e.g. 12 Weeks" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  </div>
+                  <FormField control={form.control} name="dataAiHint" render={({ field }) => (
+                    <FormItem><FormLabel>AI Image Hint</FormLabel><FormControl><Input placeholder="e.g. online course" {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField
+                    control={form.control}
+                    name="imageFile"
+                    render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Course Image</FormLabel>
+                          {course?.imageUrl && (
+                              <div className="mb-2">
+                                <Image src={course.imageUrl} alt={course.title} width={200} height={100} className="rounded-md object-cover border p-2" />
+                              </div>
+                          )}
+                          <FormControl>
+                              <Input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} onChange={(e) => field.onChange(e.target.files)} />
+                          </FormControl>
+                          <FormDesc>{course ? "Upload a new image to replace the current one." : "The main image for the course."}</FormDesc>
+                          <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField control={form.control} name="modules" render={({ field }) => (
+                    <FormItem><FormLabel>Modules</FormLabel><FormControl><Textarea className="min-h-[200px]" {...field} /></FormControl><FormDesc>Enter one module per line.</FormDesc><FormMessage /></FormItem>
+                  )} />
+                </div>
+            </ScrollArea>
+            <DialogFooter className="mt-6 pt-4 border-t">
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -231,7 +234,7 @@ export function CoursesManager() {
                                 <Image src={course.imageUrl} alt={course.title} width={120} height={80} className="rounded-md object-cover border p-1" />
                                 <div>
                                     <h3 className="font-semibold">{course.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{course.category}</p>
+                                    <p className="text-sm text-muted-foreground">{course.level} &middot; {course.duration}</p>
                                     <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{course.description}</p>
                                 </div>
                             </div>

@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getCourses, getBlogPosts } from '@/lib/actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpRight, GraduationCap, ArrowRight } from 'lucide-react';
+import { ArrowRight, GraduationCap, Clock, BarChart } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default async function CoursesPage() {
   const courses = await getCourses();
@@ -59,20 +60,23 @@ export default async function CoursesPage() {
                       width={600}
                       height={400}
                       className="object-cover w-full h-48 transition-transform duration-300 ease-in-out group-hover:scale-105"
-                      data-ai-hint="online course"
+                      data-ai-hint={course.dataAiHint}
                     />
                   </div>
                   <CardHeader>
                     <CardTitle className="text-xl">{course.title}</CardTitle>
-                    <CardDescription>{course.category}</CardDescription>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2">
+                        <Badge variant="outline" className="flex items-center gap-1.5"><BarChart className="h-3.5 w-3.5" /> {course.level}</Badge>
+                        <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {course.duration}</div>
+                    </div>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground">{course.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{course.description}</p>
                   </CardContent>
                   <CardContent>
                     <Button asChild className="w-full">
-                      <Link href={course.courseUrl} target="_blank" rel="noopener noreferrer">
-                        Learn More <ArrowUpRight className="ml-2 h-4 w-4" />
+                      <Link href={`/courses/${course.slug}`}>
+                        View Details <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </CardContent>
@@ -107,13 +111,13 @@ export default async function CoursesPage() {
               {latestPosts.map(post => (
                 <Card key={post.id} className="flex flex-col overflow-hidden group">
                     <Link href={`/blog/${post.slug}`} className="block">
-                        <div className="relative overflow-hidden">
+                        <div className="relative overflow-hidden aspect-video">
                             <Image
                                 src={post.imageUrl || 'https://placehold.co/600x400.png'}
                                 alt={post.title}
                                 width={600}
                                 height={400}
-                                className="object-cover w-full h-48 transition-transform duration-300 ease-in-out group-hover:scale-105"
+                                className="object-cover w-full transition-transform duration-300 ease-in-out group-hover:scale-105"
                                 data-ai-hint="career advice blog"
                             />
                         </div>

@@ -62,13 +62,15 @@ export type Product = {
 
 export type Course = {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  category: string;
+  level: string;
+  duration: string;
+  modules: string[];
   imageUrl: string;
   imageStoragePath: string;
-  courseUrl: string;
-  order: number;
+  dataAiHint: string;
 };
 
 export type BlogPost = {
