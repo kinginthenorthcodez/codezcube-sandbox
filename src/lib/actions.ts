@@ -5,7 +5,8 @@ import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updat
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject, type Product } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject, type Product, type Course, type BlogPost } from '@/types';
+import { format } from 'date-fns';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
   const defaultStats = {
@@ -14,10 +15,7 @@ export async function getHomepageStats(): Promise<HomepageStats> {
     yearsOfExperience: '0',
   };
 
-  if (!db) {
-    console.warn('Firestore is not initialized. Serving default stats.');
-    return defaultStats;
-  }
+  if (!db) return defaultStats;
 
   try {
     const docRef = doc(db, 'homepage', 'stats');
@@ -30,9 +28,8 @@ export async function getHomepageStats(): Promise<HomepageStats> {
 }
 
 export async function updateHomepageStats(stats: HomepageStats): Promise<{ success: boolean; message: string }> {
-  if (!db) {
-    return { success: false, message: 'Firestore is not initialized.' };
-  }
+  if (!db) return { success: false, message: 'Firestore is not initialized.' };
+  
   try {
     const docRef = doc(db, 'homepage', 'stats');
     await setDoc(docRef, stats);
@@ -40,17 +37,14 @@ export async function updateHomepageStats(stats: HomepageStats): Promise<{ succe
     revalidatePath('/admin/dashboard');
     return { success: true, message: 'Homepage stats updated successfully.' };
   } catch (error) {
-    console.error('Error updating stats:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, message: `Failed to update stats: ${errorMessage}` };
   }
 }
 
 export async function getServices(): Promise<Service[]> {
-  if (!db) {
-    console.warn('Firestore is not initialized. Serving empty services array.');
-    return [];
-  }
+  if (!db) return [];
+
   try {
     const servicesCol = collection(db, 'services');
     const q = query(servicesCol, orderBy('order'));
@@ -124,7 +118,6 @@ export async function addService(formData: FormData): Promise<{ success: boolean
         revalidatePath('/services');
         return { success: true, message: 'Service added successfully.' };
     } catch (error) {
-        console.error('Error adding service:', error);
         return { success: false, message: 'Failed to add service.' };
     }
 }
@@ -163,7 +156,6 @@ export async function updateService(id: string, formData: FormData): Promise<{ s
         revalidatePath(`/services/${serviceUpdate.slug}`);
         return { success: true, message: 'Service updated successfully.' };
     } catch (error) {
-        console.error('Error updating service:', error);
         return { success: false, message: 'Failed to update service.' };
     }
 }
@@ -182,16 +174,13 @@ export async function deleteService(id: string): Promise<{ success: boolean; mes
         revalidatePath('/services');
         return { success: true, message: 'Service deleted successfully.' };
     } catch (error) {
-        console.error('Error deleting service:', error);
         return { success: false, message: 'Failed to delete service.' };
     }
 }
 
 export async function getClients(): Promise<Client[]> {
-  if (!db) {
-    console.warn('Firestore is not initialized. Serving empty clients array.');
-    return [];
-  }
+  if (!db) return [];
+
   try {
     const clientsCol = collection(db, 'clients');
     const q = query(clientsCol, orderBy('name'));
@@ -225,7 +214,6 @@ export async function addClient(formData: FormData): Promise<{ success: boolean;
         revalidatePath('/admin/dashboard');
         return { success: true, message: 'Client added successfully.' };
     } catch (error) {
-        console.error('Error adding client:', error);
         return { success: false, message: 'Failed to add client.' };
     }
 }
@@ -257,7 +245,6 @@ export async function updateClient(id: string, formData: FormData): Promise<{ su
         revalidatePath('/admin/dashboard');
         return { success: true, message: 'Client updated successfully.' };
     } catch (error) {
-        console.error('Error updating client:', error);
         return { success: false, message: 'Failed to update client.' };
     }
 }
@@ -275,16 +262,13 @@ export async function deleteClient(id: string): Promise<{ success: boolean; mess
         revalidatePath('/admin/dashboard');
         return { success: true, message: 'Client deleted successfully.' };
     } catch (error) {
-        console.error('Error deleting client:', error);
         return { success: false, message: 'Failed to delete client.' };
     }
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  if (!db) {
-    console.warn('Firestore is not initialized. Serving empty testimonials array.');
-    return [];
-  }
+  if (!db) return [];
+
   try {
     const testimonialsCol = collection(db, 'testimonials');
     const q = query(testimonialsCol, orderBy('authorName'));
@@ -320,7 +304,6 @@ export async function addTestimonial(formData: FormData): Promise<{ success: boo
     revalidatePath('/admin/dashboard');
     return { success: true, message: 'Testimonial added successfully.' };
   } catch (error) {
-    console.error('Error adding testimonial:', error);
     return { success: false, message: 'Failed to add testimonial.' };
   }
 }
@@ -354,7 +337,6 @@ export async function updateTestimonial(id: string, formData: FormData): Promise
     revalidatePath('/admin/dashboard');
     return { success: true, message: 'Testimonial updated successfully.' };
   } catch (error) {
-    console.error('Error updating testimonial:', error);
     return { success: false, message: 'Failed to update testimonial.' };
   }
 }
@@ -372,7 +354,6 @@ export async function deleteTestimonial(id: string): Promise<{ success: boolean;
     revalidatePath('/admin/dashboard');
     return { success: true, message: 'Testimonial deleted successfully.' };
   } catch (error) {
-    console.error('Error deleting testimonial:', error);
     return { success: false, message: 'Failed to delete testimonial.' };
   }
 }
@@ -393,10 +374,7 @@ export async function getHomepageContent(): Promise<HomepageContent> {
     }
   };
 
-  if (!db) {
-    console.warn('Firestore is not initialized. Serving default content.');
-    return defaultContent;
-  }
+  if (!db) return defaultContent;
 
   try {
     const docRef = doc(db, 'homepage', 'content');
@@ -418,9 +396,8 @@ export async function getHomepageContent(): Promise<HomepageContent> {
 }
 
 export async function updateHomepageContent(content: HomepageContent): Promise<{ success: boolean; message: string }> {
-  if (!db) {
-    return { success: false, message: 'Firestore is not initialized.' };
-  }
+  if (!db) return { success: false, message: 'Firestore is not initialized.' };
+  
   try {
     const docRef = doc(db, 'homepage', 'content');
     await setDoc(docRef, content, { merge: true });
@@ -428,7 +405,6 @@ export async function updateHomepageContent(content: HomepageContent): Promise<{
     revalidatePath('/admin/dashboard');
     return { success: true, message: 'Homepage content updated successfully.' };
   } catch (error) {
-    console.error('Error updating content:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, message: `Failed to update content: ${errorMessage}` };
   }
@@ -443,10 +419,7 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
     }
   };
 
-  if (!db) {
-    console.warn('Firestore is not initialized. Serving default site config.');
-    return defaultSiteConfig;
-  }
+  if (!db) return defaultSiteConfig;
 
   try {
     const docRef = doc(db, 'site', 'configuration');
@@ -465,9 +438,8 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
 }
 
 export async function updateSiteConfiguration(config: SiteConfiguration): Promise<{ success: boolean; message: string }> {
-  if (!db) {
-    return { success: false, message: 'Firestore is not initialized.' };
-  }
+  if (!db) return { success: false, message: 'Firestore is not initialized.' };
+  
   try {
     const docRef = doc(db, 'site', 'configuration');
     await setDoc(docRef, config, { merge: true });
@@ -475,7 +447,6 @@ export async function updateSiteConfiguration(config: SiteConfiguration): Promis
     revalidatePath('/admin/dashboard');
     return { success: true, message: 'Site configuration updated successfully.' };
   } catch (error) {
-    console.error('Error updating site config:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, message: `Failed to update site config: ${errorMessage}` };
   }
@@ -515,10 +486,8 @@ const mapDocToProject = (doc: QueryDocumentSnapshot | DocumentSnapshot): Portfol
 
 
 export async function getPortfolioProjects(): Promise<PortfolioProject[]> {
-    if (!db) {
-        console.warn('Firestore is not initialized. Serving empty portfolio array.');
-        return [];
-    }
+    if (!db) return [];
+    
     try {
         const projectsCol = collection(db, 'portfolio');
         const q = query(projectsCol, orderBy('order'));
@@ -585,7 +554,6 @@ export async function addPortfolioProject(formData: FormData): Promise<{ success
         revalidatePath('/portfolio');
         return { success: true, message: 'Project added successfully.' };
     } catch (error) {
-        console.error('Error adding project:', error);
         return { success: false, message: 'Failed to add project.' };
     }
 }
@@ -638,7 +606,6 @@ export async function updatePortfolioProject(id: string, formData: FormData): Pr
         revalidatePath(`/portfolio/${projectUpdate.slug}`);
         return { success: true, message: 'Project updated successfully.' };
     } catch (error) {
-        console.error('Error updating project:', error);
         return { success: false, message: 'Failed to update project.' };
     }
 }
@@ -656,17 +623,14 @@ export async function deletePortfolioProject(id: string): Promise<{ success: boo
         revalidatePath('/portfolio');
         return { success: true, message: 'Project deleted successfully.' };
     } catch (error) {
-        console.error('Error deleting project:', error);
         return { success: false, message: 'Failed to delete project.' };
     }
 }
 
 // Product Actions
 export async function getProducts(): Promise<Product[]> {
-    if (!db) {
-        console.warn('Firestore is not initialized. Serving empty products array.');
-        return [];
-    }
+    if (!db) return [];
+    
     try {
         const productsCol = collection(db, 'products');
         const q = query(productsCol, orderBy('order'));
@@ -703,7 +667,6 @@ export async function addProduct(formData: FormData): Promise<{ success: boolean
         revalidatePath('/products');
         return { success: true, message: 'Product added successfully.' };
     } catch (error) {
-        console.error('Error adding product:', error);
         return { success: false, message: 'Failed to add product.' };
     }
 }
@@ -738,7 +701,6 @@ export async function updateProduct(id: string, formData: FormData): Promise<{ s
         revalidatePath('/products');
         return { success: true, message: 'Product updated successfully.' };
     } catch (error) {
-        console.error('Error updating product:', error);
         return { success: false, message: 'Failed to update product.' };
     }
 }
@@ -756,8 +718,214 @@ export async function deleteProduct(id: string): Promise<{ success: boolean; mes
         revalidatePath('/products');
         return { success: true, message: 'Product deleted successfully.' };
     } catch (error) {
-        console.error('Error deleting product:', error);
         return { success: false, message: 'Failed to delete product.' };
     }
 }
+
+// Course Actions
+export async function getCourses(): Promise<Course[]> {
+    if (!db) return [];
     
+    try {
+        const coursesCol = collection(db, 'courses');
+        const q = query(coursesCol, orderBy('order'));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        return [];
+    }
+}
+
+export async function addCourse(formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
+
+    const imageFile = formData.get('imageFile') as File;
+    if (!imageFile || imageFile.size === 0) return { success: false, message: 'Course image is required.' };
+
+    try {
+        const { url, storagePath } = await handleFileUpload(imageFile, 'course-images');
+        const newCourse: Omit<Course, 'id'> = {
+            title: formData.get('title') as string,
+            description: formData.get('description') as string,
+            category: formData.get('category') as string,
+            courseUrl: formData.get('courseUrl') as string,
+            order: Number(formData.get('order')),
+            imageUrl: url,
+            imageStoragePath: storagePath,
+        };
+
+        await addDoc(collection(db, 'courses'), newCourse);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/courses');
+        return { success: true, message: 'Course added successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to add course.' };
+    }
+}
+
+export async function updateCourse(id: string, formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+
+    try {
+        const docRef = doc(db, 'courses', id);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return { success: false, message: 'Course not found.' };
+
+        const existingCourse = docSnap.data() as Course;
+        const courseUpdate: Partial<Course> = {
+            title: formData.get('title') as string,
+            description: formData.get('description') as string,
+            category: formData.get('category') as string,
+            courseUrl: formData.get('courseUrl') as string,
+            order: Number(formData.get('order')),
+        };
+
+        const imageFile = formData.get('imageFile') as File;
+        if (imageFile && imageFile.size > 0) {
+            await handleDeleteFile(existingCourse.imageStoragePath);
+            const { url, storagePath } = await handleFileUpload(imageFile, 'course-images');
+            courseUpdate.imageUrl = url;
+            courseUpdate.imageStoragePath = storagePath;
+        }
+
+        await updateDoc(docRef, courseUpdate);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/courses');
+        return { success: true, message: 'Course updated successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to update course.' };
+    }
+}
+
+export async function deleteCourse(id: string): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+    try {
+        const docRef = doc(db, 'courses', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            await handleDeleteFile(docSnap.data().imageStoragePath);
+        }
+        await deleteDoc(docRef);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/courses');
+        return { success: true, message: 'Course deleted successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to delete course.' };
+    }
+}
+
+// Blog Post (Career Advice) Actions
+export async function getBlogPosts(): Promise<BlogPost[]> {
+    if (!db) return [];
+    
+    try {
+        const blogPostsCol = collection(db, 'blogPosts');
+        const q = query(blogPostsCol, orderBy('date', 'desc'));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
+    } catch (error) {
+        console.error('Error fetching blog posts:', error);
+        return [];
+    }
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+    if (!db) return null;
+    try {
+        const q = query(collection(db, 'blogPosts'), where("slug", "==", slug), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) return null;
+        const doc = querySnapshot.docs[0];
+        return { id: doc.id, ...doc.data() } as BlogPost;
+    } catch (error) {
+        console.error('Error fetching blog post by slug:', error);
+        return null;
+    }
+}
+
+export async function addBlogPost(formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
+
+    const imageFile = formData.get('imageFile') as File;
+    if (!imageFile || imageFile.size === 0) return { success: false, message: 'Post image is required.' };
+
+    try {
+        const { url, storagePath } = await handleFileUpload(imageFile, 'blog-images');
+        const newPost: Omit<BlogPost, 'id'> = {
+            title: formData.get('title') as string,
+            slug: formData.get('slug') as string,
+            author: formData.get('author') as string,
+            date: format(new Date(), 'MMMM d, yyyy'),
+            category: formData.get('category') as string,
+            excerpt: formData.get('excerpt') as string,
+            content: formData.get('content') as string,
+            imageUrl: url,
+            imageStoragePath: storagePath,
+        };
+
+        await addDoc(collection(db, 'blogPosts'), newPost);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/blog');
+        revalidatePath('/courses');
+        return { success: true, message: 'Blog post added successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to add blog post.' };
+    }
+}
+
+export async function updateBlogPost(id: string, formData: FormData): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+
+    try {
+        const docRef = doc(db, 'blogPosts', id);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return { success: false, message: 'Blog post not found.' };
+
+        const existingPost = docSnap.data() as BlogPost;
+        const postUpdate: Partial<BlogPost> = {
+            title: formData.get('title') as string,
+            slug: formData.get('slug') as string,
+            author: formData.get('author') as string,
+            category: formData.get('category') as string,
+            excerpt: formData.get('excerpt') as string,
+            content: formData.get('content') as string,
+            // Date is not updated on edit
+        };
+
+        const imageFile = formData.get('imageFile') as File;
+        if (imageFile && imageFile.size > 0) {
+            await handleDeleteFile(existingPost.imageStoragePath);
+            const { url, storagePath } = await handleFileUpload(imageFile, 'blog-images');
+            postUpdate.imageUrl = url;
+            postUpdate.imageStoragePath = storagePath;
+        }
+
+        await updateDoc(docRef, postUpdate);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/blog');
+        revalidatePath(`/blog/${postUpdate.slug}`);
+        revalidatePath('/courses');
+        return { success: true, message: 'Blog post updated successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to update blog post.' };
+    }
+}
+
+export async function deleteBlogPost(id: string): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+    try {
+        const docRef = doc(db, 'blogPosts', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            await handleDeleteFile(docSnap.data().imageStoragePath);
+        }
+        await deleteDoc(docRef);
+        revalidatePath('/admin/dashboard');
+        revalidatePath('/blog');
+        revalidatePath('/courses');
+        return { success: true, message: 'Blog post deleted successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to delete blog post.' };
+    }
+}

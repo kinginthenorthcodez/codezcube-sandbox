@@ -2,8 +2,15 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { getCourses, getBlogPosts } from '@/lib/actions';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowUpRight, GraduationCap, ArrowRight } from 'lucide-react';
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  const courses = await getCourses();
+  const blogPosts = await getBlogPosts();
+  const latestPosts = blogPosts.slice(0, 3);
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -34,43 +41,101 @@ export default function CoursesPage() {
 
       {/* Our Courses Section */}
       <section id="our-courses" className="py-16 md:py-24">
-        <div className="container text-center">
-          <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="container">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Our Courses</h2>
             <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg">
-              No courses available at the moment. Check back soon!
+              Explore our curated list of courses designed to equip you with in-demand tech skills.
             </p>
           </div>
+          {courses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {courses.map(course => (
+                <Card key={course.id} className="flex flex-col overflow-hidden group">
+                  <div className="relative overflow-hidden">
+                    <Image
+                      src={course.imageUrl || 'https://placehold.co/600x400.png'}
+                      alt={course.title}
+                      width={600}
+                      height={400}
+                      className="object-cover w-full h-48 transition-transform duration-300 ease-in-out group-hover:scale-105"
+                      data-ai-hint="online course"
+                    />
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-xl">{course.title}</CardTitle>
+                    <CardDescription>{course.category}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-sm text-muted-foreground">{course.description}</p>
+                  </CardContent>
+                  <CardContent>
+                    <Button asChild className="w-full">
+                      <Link href={course.courseUrl} target="_blank" rel="noopener noreferrer">
+                        Learn More <ArrowUpRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+             <div className="flex flex-col items-center justify-center text-center py-16">
+                <div className="bg-primary/10 text-primary p-4 rounded-full mb-6">
+                    <GraduationCap className="h-12 w-12" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Courses Coming Soon!</h3>
+                <p className="max-w-prose text-muted-foreground">
+                    We're developing new courses to help you achieve your career goals. Check back soon for updates.
+                </p>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Career Development Section */}
       <section id="career-advice" className="py-16 md:py-24 bg-secondary/50">
-        <div className="container text-center">
-          <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="container">
+           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Career Development & Advice</h2>
             <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg">
-              No career advice articles found. Please ensure they are added to the 'careerAdvice' collection in Firestore with the correct fields (title, content, description, order).
+              Gain insights from our latest articles on career growth, industry trends, and skill development.
             </p>
-             <Button asChild className="mt-4">
-              <Link href="/blog">Read Career Articles</Link>
-            </Button>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section id="cta" className="py-16 md:py-24">
-        <div className="container">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Ready to Upskill?</h2>
-            <p className="max-w-[800px] text-muted-foreground md:text-xl">
-              Invest in yourself with Codezcube. Our courses are designed to equip you with the skills needed for tomorrow's tech landscape.
-            </p>
-            <Button asChild size="lg" className="mt-4">
-              <Link href="/booking">Enroll or Inquire Now</Link>
-            </Button>
-          </div>
+           {latestPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {latestPosts.map(post => (
+                <Card key={post.id} className="flex flex-col overflow-hidden group">
+                    <Link href={`/blog/${post.slug}`} className="block">
+                        <div className="relative overflow-hidden">
+                            <Image
+                                src={post.imageUrl || 'https://placehold.co/600x400.png'}
+                                alt={post.title}
+                                width={600}
+                                height={400}
+                                className="object-cover w-full h-48 transition-transform duration-300 ease-in-out group-hover:scale-105"
+                                data-ai-hint="career advice blog"
+                            />
+                        </div>
+                    </Link>
+                    <CardHeader>
+                        <CardTitle className="text-xl leading-tight hover:text-primary"><Link href={`/blog/${post.slug}`}>{post.title}</Link></CardTitle>
+                         <CardDescription>{post.date} &middot; {post.category}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                        <p className="text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>
+                    </CardContent>
+                </Card>
+              ))}
+            </div>
+           ) : (
+             <p className="text-center text-muted-foreground">No career advice articles found. Please check back later.</p>
+           )}
+           <div className="text-center mt-12">
+             <Button asChild>
+                <Link href="/blog">Read All Articles <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+           </div>
         </div>
       </section>
     </div>

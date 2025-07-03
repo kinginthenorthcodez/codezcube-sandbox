@@ -60,6 +60,29 @@ export type Product = {
   order: number;
 };
 
+export type Course = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  imageStoragePath: string;
+  courseUrl: string;
+  order: number;
+};
+
+export type BlogPost = {
+  id: string;
+  slug: string;
+  title: string;
+  author: string;
+  date: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  imageUrl: string;
+  imageStoragePath: string;
+}
 
 export type Client = {
   id:string;

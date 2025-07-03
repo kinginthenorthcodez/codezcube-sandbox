@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useAuth } from "@/hooks/use-auth";
@@ -12,6 +13,8 @@ import { HomepageContentManager } from "./homepage-content-manager";
 import { SiteConfigurationManager } from "./site-configuration-manager";
 import { PortfolioManager } from "./portfolio-manager";
 import { ProductsManager } from "./products-manager";
+import { CoursesManager } from "./courses-manager";
+import { BlogManager } from "./blog-manager";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -60,6 +63,12 @@ export default function DashboardPage() {
       </div>
       <div id="products">
         <ProductsManager />
+      </div>
+      <div id="courses">
+        <CoursesManager />
+      </div>
+       <div id="blog">
+        <BlogManager />
       </div>
       <div id="clients">
         <ClientsManager />
