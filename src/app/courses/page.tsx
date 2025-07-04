@@ -28,12 +28,12 @@ export default async function CoursesPage() {
             </div>
             <div className="flex items-center justify-center">
               <Image
-                src="https://placehold.co/600x400.png"
+                src="https://firebasestorage.googleapis.com/v0/b/codezcube-sandbox.firebasestorage.app/o/images%2Fundraw_educator_6dgp.svg?alt=media&token=f18d2a38-ee4d-4996-9575-6e6f65e1b287"
                 width={600}
                 height={400}
                 alt="Courses and Career Paths"
                 className="mx-auto overflow-hidden rounded-xl object-cover object-center shadow-lg"
-                data-ai-hint="people teaching whiteboard"
+                data-ai-hint="educator teaching"
               />
             </div>
           </div>
