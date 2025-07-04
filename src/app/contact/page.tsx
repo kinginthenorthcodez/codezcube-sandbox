@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { Suspense, useEffect } from "react"
@@ -20,6 +21,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Phone, MapPin, Loader2 } from "lucide-react"
+import { getSiteConfiguration } from "@/lib/actions"
+import type { SiteConfiguration } from "@/types"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -135,7 +138,10 @@ function ContactForm() {
 }
 
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const config = await getSiteConfiguration();
+  const { contactInfo } = config;
+
   return (
     <div className="container py-16 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -156,7 +162,7 @@ export default function ContactPage() {
                   <div>
                       <h3 className="font-semibold">Email</h3>
                       <p className="text-muted-foreground">Reach out to us for any inquiries.</p>
-                      <a href="mailto:hello@codezcube.com" className="text-primary hover:underline">hello@codezcube.com</a>
+                      <a href={`mailto:${contactInfo.email}`} className="text-primary hover:underline">{contactInfo.email}</a>
                   </div>
               </div>
               <div className="flex items-start gap-4">
@@ -166,7 +172,7 @@ export default function ContactPage() {
                   <div>
                       <h3 className="font-semibold">Phone</h3>
                       <p className="text-muted-foreground">Mon-Fri from 9am to 5pm.</p>
-                      <a href="tel:+260977123456" className="text-primary hover:underline">+260 977 123 456</a>
+                      <a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`} className="text-primary hover:underline">{contactInfo.phone}</a>
                   </div>
               </div>
               <div className="flex items-start gap-4">
@@ -175,8 +181,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                       <h3 className="font-semibold">Office</h3>
-                      <p className="text-muted-foreground">Lusaka, Zambia</p>
-                      <p className="text-primary">123 Innovation Drive, Woodlands</p>
+                      <p className="text-muted-foreground">{contactInfo.addressLine1}</p>
+                      <p className="text-primary">{contactInfo.addressLine2}</p>
                   </div>
               </div>
             </div>

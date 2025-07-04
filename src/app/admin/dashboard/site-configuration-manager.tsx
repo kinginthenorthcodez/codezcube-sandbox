@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const configSchema = z.object({
   socialLinks: z.object({
@@ -20,6 +21,12 @@ const configSchema = z.object({
     twitter: z.string().url("Please enter a valid URL.").or(z.literal('')),
     linkedin: z.string().url("Please enter a valid URL.").or(z.literal('')),
   }),
+  contactInfo: z.object({
+      email: z.string().email("Please enter a valid email address.").or(z.literal('')),
+      phone: z.string().min(1, "Phone number is required.").or(z.literal('')),
+      addressLine1: z.string().min(1, "Address is required.").or(z.literal('')),
+      addressLine2: z.string().optional(),
+  })
 });
 
 export function SiteConfigurationManager() {
@@ -31,6 +38,7 @@ export function SiteConfigurationManager() {
     resolver: zodResolver(configSchema),
     defaultValues: {
       socialLinks: { github: "", twitter: "", linkedin: "" },
+      contactInfo: { email: "", phone: "", addressLine1: "", addressLine2: "" },
     },
   });
 
@@ -82,7 +90,7 @@ export function SiteConfigurationManager() {
     <Card>
       <CardHeader>
         <CardTitle>Site Configuration</CardTitle>
-        <CardDescription>Manage global site settings like social media links.</CardDescription>
+        <CardDescription>Manage global site settings like social media links and contact information.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -108,6 +116,42 @@ export function SiteConfigurationManager() {
                   <FormItem>
                     <FormLabel>LinkedIn URL</FormLabel>
                     <FormControl><Input placeholder="https://linkedin.com/in/your-profile" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-medium mb-4">Contact Information</h3>
+              <div className="space-y-4 pl-4 border-l-2 border-accent">
+                 <FormField control={form.control} name="contactInfo.email" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl><Input placeholder="hello@example.com" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="contactInfo.phone" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl><Input placeholder="+1 234 567 890" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="contactInfo.addressLine1" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address Line 1</FormLabel>
+                    <FormControl><Input placeholder="e.g. Lusaka, Zambia" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="contactInfo.addressLine2" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address Line 2</FormLabel>
+                    <FormControl><Input placeholder="e.g. 123 Innovation Drive, Woodlands" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />

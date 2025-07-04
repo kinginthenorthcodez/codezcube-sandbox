@@ -416,6 +416,12 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
       github: '#',
       twitter: '#',
       linkedin: '#',
+    },
+    contactInfo: {
+      email: 'hello@codezcube.com',
+      phone: '+260 977 123 456',
+      addressLine1: 'Lusaka, Zambia',
+      addressLine2: '123 Innovation Drive, Woodlands',
     }
   };
 
@@ -427,7 +433,10 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      return { socialLinks: { ...defaultSiteConfig.socialLinks, ...data.socialLinks } };
+      return { 
+        socialLinks: { ...defaultSiteConfig.socialLinks, ...data.socialLinks },
+        contactInfo: { ...defaultSiteConfig.contactInfo, ...data.contactInfo },
+      };
     } else {
       return defaultSiteConfig;
     }
@@ -445,6 +454,7 @@ export async function updateSiteConfiguration(config: SiteConfiguration): Promis
     await setDoc(docRef, config, { merge: true });
     revalidatePath('/');
     revalidatePath('/admin/dashboard');
+    revalidatePath('/contact');
     return { success: true, message: 'Site configuration updated successfully.' };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
