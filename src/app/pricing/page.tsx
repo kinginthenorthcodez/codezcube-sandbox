@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle, DollarSign, Download, Mail, MessageSquare, Sparkles, Tag, Users, Bot, Briefcase, BarChart, Settings, Globe, CircleDollarSign, PlusCircle } from 'lucide-react';
+import { CheckCircle, DollarSign, Download, Mail, MessageSquare, ShieldCheck, Users, Bot, Briefcase, BarChart, Settings, Globe, CircleDollarSign, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const pricingData = {
@@ -45,6 +45,16 @@ const pricingData = {
       { plan: "BI Suite", price: "$2,000+", includes: "Full data warehouse + dashboards" },
     ],
     addOns: "",
+  },
+  cyberSecurity: {
+    title: "Cyber Security",
+    icon: <ShieldCheck className="h-6 w-6" />,
+    plans: [
+      { plan: "Vulnerability Scan", price: "$500 (one time)", includes: "Comprehensive scan of one web application for known vulnerabilities (e.g., OWASP Top 10)." },
+      { plan: "Penetration Test", price: "$2,500+", includes: "Simulated cyber-attack against your system to check for exploitable vulnerabilities." },
+      { plan: "Security Retainer", price: "Custom Quote", includes: "Ongoing security monitoring, incident response, and regular audits." },
+    ],
+    addOns: "Phishing simulation campaign ($400), Employee security training ($300+)",
   },
   maintenance: {
     title: "Maintenance & Support Plans",
@@ -121,6 +131,7 @@ export default function PricingPage() {
             <PricingSection section={pricingData.ai} />
             <PricingSection section={pricingData.training} />
             <PricingSection section={pricingData.data} />
+            <PricingSection section={pricingData.cyberSecurity} />
             <PricingSection section={pricingData.maintenance} />
         </div>
         
