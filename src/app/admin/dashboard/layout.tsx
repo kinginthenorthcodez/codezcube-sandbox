@@ -2,7 +2,7 @@
 "use client"
 
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from '@/components/ui/sidebar';
-import { Settings, Home, Blocks, Users, LayoutDashboard, MessageSquareQuote, LayoutTemplate, Share2, LayoutGrid, Package, GraduationCap, Newspaper } from 'lucide-react';
+import { Settings, Home, Blocks, Users, LayoutDashboard, MessageSquareQuote, LayoutTemplate, Share2, LayoutGrid, Package, GraduationCap, Newspaper, Inbox } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -86,6 +86,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <SidebarMenuButton href="/admin/dashboard/testimonials" tooltip={{children: "Testimonials"}} isActive={pathname === '/admin/dashboard/testimonials'}>
                   <MessageSquareQuote />
                   Testimonials
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton href="/admin/dashboard/messages" tooltip={{children: "Messages"}} isActive={pathname === '/admin/dashboard/messages'}>
+                  <Inbox />
+                  Messages
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

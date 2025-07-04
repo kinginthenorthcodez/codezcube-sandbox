@@ -141,3 +141,13 @@ export type SiteConfiguration = {
   contactInfo: ContactInfo;
   calendlyUrl: string;
 };
+
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  receivedAt: string; // ISO string
+  isRead: boolean;
+};

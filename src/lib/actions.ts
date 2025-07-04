@@ -1,11 +1,11 @@
 
 'use server';
 
-import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, where, limit, type DocumentSnapshot, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, where, limit, type DocumentSnapshot, type QueryDocumentSnapshot, Timestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { revalidatePath } from 'next/cache';
 import { db, storage } from '@/lib/firebase';
-import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject, type Product, type Course, type BlogPost } from '@/types';
+import { type HomepageStats, type Service, type Client, type Testimonial, type HomepageContent, type SiteConfiguration, type PortfolioProject, type Product, type Course, type BlogPost, type ContactMessage } from '@/types';
 import { format } from 'date-fns';
 
 export async function getHomepageStats(): Promise<HomepageStats> {
@@ -959,5 +959,72 @@ export async function deleteBlogPost(id: string): Promise<{ success: boolean; me
         return { success: true, message: 'Blog post deleted successfully.' };
     } catch (error) {
         return { success: false, message: 'Failed to delete blog post.' };
+    }
+}
+
+// Contact Message Actions
+export async function saveContactMessage(data: Omit<ContactMessage, 'id' | 'receivedAt' | 'isRead'>): Promise<{ success: boolean; message: string }> {
+  if (!db) return { success: false, message: 'Firestore is not initialized.' };
+  
+  try {
+    const newMessage = {
+      ...data,
+      receivedAt: Timestamp.now(),
+      isRead: false,
+    };
+    await addDoc(collection(db, 'messages'), newMessage);
+    return { success: true, message: 'Your message has been sent successfully!' };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return { success: false, message: `Failed to send message: ${errorMessage}` };
+  }
+}
+
+export async function getMessages(): Promise<ContactMessage[]> {
+  if (!db) return [];
+
+  try {
+    const messagesCol = collection(db, 'messages');
+    const q = query(messagesCol, orderBy('receivedAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        const receivedAtDate = (data.receivedAt as Timestamp).toDate();
+        return { 
+            id: doc.id,
+            name: data.name,
+            email: data.email,
+            subject: data.subject,
+            message: data.message,
+            isRead: data.isRead,
+            receivedAt: format(receivedAtDate, "PPpp"), // Format to a readable string e.g. "Sep 21, 2023, 4:25:31 PM"
+         } as ContactMessage
+    });
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    return [];
+  }
+}
+
+export async function deleteMessage(id: string): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+    try {
+        await deleteDoc(doc(db, 'messages', id));
+        revalidatePath('/admin/dashboard/messages');
+        return { success: true, message: 'Message deleted successfully.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to delete message.' };
+    }
+}
+
+export async function updateMessageStatus(id: string, isRead: boolean): Promise<{ success: boolean; message: string }> {
+    if (!db) return { success: false, message: 'Firebase is not initialized.' };
+    try {
+        const docRef = doc(db, 'messages', id);
+        await updateDoc(docRef, { isRead });
+        revalidatePath('/admin/dashboard/messages');
+        return { success: true, message: 'Message status updated.' };
+    } catch (error) {
+        return { success: false, message: 'Failed to update message status.' };
     }
 }
