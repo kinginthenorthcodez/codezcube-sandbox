@@ -184,7 +184,7 @@ export default function PricingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-x-6 gap-y-2 text-muted-foreground">
                 <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    <a href="mailto:hello@codezcube.com" className="hover:text-primary">hello@codezcube.com</a>
+                    <a href="mailto:info@codezcube.com" className="hover:text-primary">info@codezcube.com</a>
                 </div>
                 <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
