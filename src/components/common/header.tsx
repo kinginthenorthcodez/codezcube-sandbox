@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -29,7 +28,7 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const { user, signOut, loading } = useAuth()
+  const { user, signOut, loading, isAdmin } = useAuth()
 
   const navLinks = allNavLinks.filter(link => {
     if (link.href === '/pricing') {
@@ -92,7 +91,7 @@ export function Header() {
                           </Avatar>
                           <span className="text-sm font-medium truncate">{user.email}</span>
                       </div>
-                      <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin/dashboard">Dashboard</Link></Button>
+                      {isAdmin && <Button asChild onClick={() => setIsOpen(false)}><Link href="/admin/dashboard">Dashboard</Link></Button>}
                       <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
                      </>
                   ) : (
@@ -142,13 +141,15 @@ export function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin/dashboard">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/dashboard">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {isAdmin && <DropdownMenuSeparator />}
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>

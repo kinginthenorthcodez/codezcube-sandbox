@@ -13,8 +13,13 @@ import {
 } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase';
 
+// Hardcoded list of admin emails. In a production app, this would likely be
+// managed via a database or Firebase custom claims.
+const ADMIN_EMAILS = ['admin@codezcube.com'];
+
 interface AuthContextType {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string) => Promise<void>;
@@ -27,12 +32,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isFirebaseConfigured && auth) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
+        setIsAdmin(user ? ADMIN_EMAILS.includes(user.email || '') : false);
         setLoading(false);
       });
 
@@ -78,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const value = { user, loading, signIn, signUp, signInWithGoogle, signInWithGitHub, signOut };
+  const value = { user, isAdmin, loading, signIn, signUp, signInWithGoogle, signInWithGitHub, signOut };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react"
 import { type SiteConfiguration } from "@/types"
 
 export function Footer() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const [config, setConfig] = useState<SiteConfiguration | null>(null);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function Footer() {
                 <li><Link href="/portfolio" className="text-sm text-muted-foreground hover:text-primary">Case Studies</Link></li>
                 <li><Link href="/blog" className="text-sm text-muted-foreground hover:text-primary">Blog</Link></li>
                 <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
-                {!loading && user && <li><Link href="/admin" className="text-sm text-muted-foreground hover:text-primary">Admin</Link></li>}
+                {!loading && user && isAdmin && <li><Link href="/admin" className="text-sm text-muted-foreground hover:text-primary">Admin</Link></li>}
               </ul>
             </div>
             <div>
