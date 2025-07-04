@@ -11,11 +11,10 @@ import {
   GithubAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import { auth, isFirebaseConfigured } from '@/lib/firebase';
+import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { type AppUser } from '@/types';
 
-// Hardcoded list of admin emails. In a production app, this would likely be
-// managed via a database or Firebase custom claims.
-const ADMIN_EMAILS = ['admin@codezcube.com'];
 
 interface AuthContextType {
   user: User | null;
@@ -36,17 +35,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isFirebaseConfigured && auth) {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setUser(user);
-        setIsAdmin(user ? ADMIN_EMAILS.includes(user.email || '') : false);
-        setLoading(false);
-      });
-
-      return () => unsubscribe();
-    } else {
-      setLoading(false); // If firebase is not configured, stop loading.
+    if (!isFirebaseConfigured || !auth || !db) {
+      setLoading(false);
+      return;
     }
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data() as AppUser;
+          setIsAdmin(userData.role === 'admin');
+        } else {
+          // New user (first-time sign-up/social login), create their record in Firestore
+          const newUser: AppUser = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || user.email?.split('@')[0] || 'User',
+            photoURL: user.photoURL,
+            role: 'user', // Default role for all new users
+          };
+          await setDoc(userDocRef, newUser);
+          // New users are not admins by default.
+          // To make a user an admin, change their role in the Firestore console.
+          setIsAdmin(false);
+        }
+        setUser(user);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const signIn = async (email: string, pass: string) => {
