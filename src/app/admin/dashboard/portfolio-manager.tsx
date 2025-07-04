@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, PlusCircle, Trash, Edit } from "lucide-react";
+import { Loader2, PlusCircle, Trash, Edit, LayoutGrid } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -310,42 +310,50 @@ export function PortfolioManager() {
                 />
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {projects.map(project => (
-                        <div key={project.id} className="flex items-start justify-between p-4 border rounded-lg">
-                            <div className="flex items-start gap-4">
-                               <Image src={project.imageUrl} alt={project.title} width={120} height={80} className="rounded-md object-cover border p-1" />
-                                <div>
-                                    <h3 className="font-semibold">{project.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{project.category}</p>
-                                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{project.description}</p>
+                {projects.length > 0 ? (
+                    <div className="space-y-4">
+                        {projects.map(project => (
+                            <div key={project.id} className="flex items-start justify-between p-4 border rounded-lg">
+                                <div className="flex items-start gap-4">
+                                   <Image src={project.imageUrl} alt={project.title} width={120} height={80} className="rounded-md object-cover border p-1" />
+                                    <div>
+                                        <h3 className="font-semibold">{project.title}</h3>
+                                        <p className="text-sm text-muted-foreground">{project.category}</p>
+                                        <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{project.description}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <ProjectFormDialog
+                                        trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
+                                        project={project}
+                                        onSave={onSave}
+                                    />
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"><Trash className="h-4 w-4" /></Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>This action cannot be undone. This will permanently delete the project and its image.</AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(project.id)}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
-                                <ProjectFormDialog
-                                    trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
-                                    project={project}
-                                    onSave={onSave}
-                                />
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"><Trash className="h-4 w-4" /></Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>This action cannot be undone. This will permanently delete the project and its image.</AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(project.id)}>Delete</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center text-muted-foreground py-12">
+                        <LayoutGrid className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-4 text-lg font-semibold">No portfolio projects yet</h3>
+                        <p className="mt-1 text-sm">Get started by adding your first project.</p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

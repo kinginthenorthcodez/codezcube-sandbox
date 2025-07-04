@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, PlusCircle, Trash, Edit } from "lucide-react";
+import { Loader2, PlusCircle, Trash, Edit, GraduationCap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Image from "next/image";
@@ -227,47 +227,50 @@ export function CoursesManager() {
                 />
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {courses.map(course => (
-                        <div key={course.id} className="flex items-start justify-between p-4 border rounded-lg">
-                           <div className="flex items-start gap-4">
-                                <Image src={course.imageUrl} alt={course.title} width={120} height={80} className="rounded-md object-cover border p-1" />
-                                <div>
-                                    <h3 className="font-semibold">{course.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{course.level} &middot; {course.duration}</p>
-                                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{course.description}</p>
+                {courses.length > 0 ? (
+                    <div className="space-y-4">
+                        {courses.map(course => (
+                            <div key={course.id} className="flex items-start justify-between p-4 border rounded-lg">
+                               <div className="flex items-start gap-4">
+                                    <Image src={course.imageUrl} alt={course.title} width={120} height={80} className="rounded-md object-cover border p-1" />
+                                    <div>
+                                        <h3 className="font-semibold">{course.title}</h3>
+                                        <p className="text-sm text-muted-foreground">{course.level} &middot; {course.duration}</p>
+                                        <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{course.description}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <CourseFormDialog
+                                        trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
+                                        course={course}
+                                        onSave={onSave}
+                                    />
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"><Trash className="h-4 w-4" /></Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>This action cannot be undone. This will permanently delete the course and its image.</AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(course.id)}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
-                                <CourseFormDialog
-                                    trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
-                                    course={course}
-                                    onSave={onSave}
-                                />
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"><Trash className="h-4 w-4" /></Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>This action cannot be undone. This will permanently delete the course and its image.</AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(course.id)}>Delete</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
-                        </div>
-                    ))}
-                     {courses.length === 0 && (
-                        <div className="text-center text-muted-foreground py-12">
-                            <p>No courses have been added yet.</p>
-                        </div>
-                    )}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center text-muted-foreground py-12">
+                        <GraduationCap className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-4 text-lg font-semibold">No courses yet</h3>
+                        <p className="mt-1 text-sm">Get started by adding your first course.</p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

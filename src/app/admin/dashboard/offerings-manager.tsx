@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -12,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, PlusCircle, Trash, Edit, HelpCircle } from "lucide-react";
+import { Loader2, PlusCircle, Trash, Edit, HelpCircle, Blocks } from "lucide-react";
 import * as icons from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -237,41 +238,49 @@ export function ServicesManager() {
                 />
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {services.map(service => (
-                        <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg">
-                            <div className="flex items-center gap-4">
-                                <DynamicIcon name={service.iconName} />
-                                <div>
-                                    <h3 className="font-semibold">{service.title}</h3>
-                                    <p className="text-sm text-muted-foreground">{service.description}</p>
+                {services.length > 0 ? (
+                    <div className="space-y-4">
+                        {services.map(service => (
+                            <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                <div className="flex items-center gap-4">
+                                    <DynamicIcon name={service.iconName} />
+                                    <div>
+                                        <h3 className="font-semibold">{service.title}</h3>
+                                        <p className="text-sm text-muted-foreground">{service.description}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <ServiceFormDialog
+                                        trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
+                                        service={service}
+                                        onSave={onSave}
+                                    />
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"><Trash className="h-4 w-4" /></Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>This action cannot be undone. This will permanently delete the service and its image.</AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(service.id)}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
-                                <ServiceFormDialog
-                                    trigger={<Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>}
-                                    service={service}
-                                    onSave={onSave}
-                                />
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"><Trash className="h-4 w-4" /></Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                            <AlertDialogDescription>This action cannot be undone. This will permanently delete the service and its image.</AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(service.id)}>Delete</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center text-muted-foreground py-12">
+                        <Blocks className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-4 text-lg font-semibold">No services yet</h3>
+                        <p className="mt-1 text-sm">Get started by adding your first core service.</p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
