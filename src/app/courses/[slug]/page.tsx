@@ -69,14 +69,23 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                 </CardContent>
             </Card>
 
-             <div className="mt-16 text-center border-t pt-12">
-                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Ready to Enroll?</h2>
+            <div className="mt-16 text-center border-t pt-12">
+                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Ready to Take the Next Step?</h2>
                  <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg my-4">
-                     Take the next step in your career. Book a consultation call to discuss this course and your goals.
+                     Whether you're ready to enroll or just have a few questions, we're here to help you on your learning journey.
                  </p>
-                 <Button asChild size="lg">
-                     <Link href="/booking">Book a Consultation</Link>
-                 </Button>
+                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Button asChild size="lg">
+                        <Link href={`/contact?subject=${encodeURIComponent(`Enrollment Inquiry: ${course.title}`)}&message=${encodeURIComponent(`I'm interested in enrolling in the "${course.title}" course. Please provide me with more details on the next steps.`)}`}>
+                            Enroll Now
+                        </Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline">
+                        <Link href={`/contact?subject=${encodeURIComponent(`Question About: ${course.title}`)}`}>
+                            Inquire
+                        </Link>
+                    </Button>
+                 </div>
             </div>
         </div>
     );

@@ -1,5 +1,8 @@
+
 "use client"
 
+import { Suspense, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -16,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, Phone, MapPin } from "lucide-react"
+import { Mail, Phone, MapPin, Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,18 +36,26 @@ const formSchema = z.object({
   }),
 })
 
-export default function ContactPage() {
+function ContactForm() {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
-      subject: "",
-      message: "",
+      subject: searchParams.get('subject') || "",
+      message: searchParams.get('message') || "",
     },
   })
+
+  useEffect(() => {
+    const subject = searchParams.get('subject')
+    const message = searchParams.get('message')
+    if (subject) form.setValue('subject', subject)
+    if (message) form.setValue('message', message)
+  }, [searchParams, form])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
@@ -55,6 +66,76 @@ export default function ContactPage() {
     form.reset()
   }
 
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Send us a message</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="john.doe@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subject</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Project Inquiry" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Your Message</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Tell us about your project..." className="min-h-[120px]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">Send Message</Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  )
+}
+
+
+export default function ContactPage() {
   return (
     <div className="container py-16 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -101,70 +182,13 @@ export default function ContactPage() {
             </div>
         </div>
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Send us a message</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="john.doe@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Subject</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Project Inquiry" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Your Message</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Tell us about your project..." className="min-h-[120px]" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">Send Message</Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          }>
+            <ContactForm />
+          </Suspense>
         </div>
       </div>
     </div>
