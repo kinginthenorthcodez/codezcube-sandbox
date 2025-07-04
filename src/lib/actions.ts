@@ -422,7 +422,8 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
       phone: '+260 977 123 456',
       addressLine1: 'Lusaka, Zambia',
       addressLine2: '123 Innovation Drive, Woodlands',
-    }
+    },
+    calendlyUrl: 'https://calendly.com/codezcubedecodes/30min',
   };
 
   if (!db) return defaultSiteConfig;
@@ -434,6 +435,8 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
     if (docSnap.exists()) {
       const data = docSnap.data();
       return { 
+        ...defaultSiteConfig,
+        ...data,
         socialLinks: { ...defaultSiteConfig.socialLinks, ...data.socialLinks },
         contactInfo: { ...defaultSiteConfig.contactInfo, ...data.contactInfo },
       };
@@ -455,6 +458,7 @@ export async function updateSiteConfiguration(config: SiteConfiguration): Promis
     revalidatePath('/');
     revalidatePath('/admin/dashboard');
     revalidatePath('/contact');
+    revalidatePath('/booking');
     return { success: true, message: 'Site configuration updated successfully.' };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';

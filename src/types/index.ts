@@ -139,4 +139,5 @@ export type ContactInfo = {
 export type SiteConfiguration = {
   socialLinks: SocialLinks;
   contactInfo: ContactInfo;
+  calendlyUrl: string;
 };

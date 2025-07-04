@@ -21,6 +21,7 @@ const configSchema = z.object({
     twitter: z.string().url("Please enter a valid URL.").or(z.literal('')),
     linkedin: z.string().url("Please enter a valid URL.").or(z.literal('')),
   }),
+  calendlyUrl: z.string().url("Please enter a valid Calendly URL.").or(z.literal('')),
   contactInfo: z.object({
       email: z.string().email("Please enter a valid email address.").or(z.literal('')),
       phone: z.string().min(1, "Phone number is required.").or(z.literal('')),
@@ -39,6 +40,7 @@ export function SiteConfigurationManager() {
     defaultValues: {
       socialLinks: { github: "", twitter: "", linkedin: "" },
       contactInfo: { email: "", phone: "", addressLine1: "", addressLine2: "" },
+      calendlyUrl: "",
     },
   });
 
@@ -116,6 +118,21 @@ export function SiteConfigurationManager() {
                   <FormItem>
                     <FormLabel>LinkedIn URL</FormLabel>
                     <FormControl><Input placeholder="https://linkedin.com/in/your-profile" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-medium mb-4">Scheduling Link</h3>
+              <div className="space-y-4 pl-4 border-l-2">
+                <FormField control={form.control} name="calendlyUrl" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Calendly URL</FormLabel>
+                    <FormControl><Input placeholder="https://calendly.com/your-profile/30min" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
