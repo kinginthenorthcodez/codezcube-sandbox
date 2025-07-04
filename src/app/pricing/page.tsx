@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle, DollarSign, Download, Mail, MessageSquare, ShieldCheck, Users, Bot, Briefcase, BarChart, Settings, Globe, CircleDollarSign, PlusCircle } from 'lucide-react';
+import { CheckCircle, DollarSign, Download, Mail, MessageSquare, ShieldCheck, Users, Bot, Briefcase, BarChart, Settings, Globe, CircleDollarSign, PlusCircle, Palette } from 'lucide-react';
 import Link from 'next/link';
 
 const pricingData = {
@@ -45,6 +45,16 @@ const pricingData = {
       { plan: "BI Suite", price: "$2,000+", includes: "Full data warehouse + dashboards" },
     ],
     addOns: "",
+  },
+  digitalGraphics: {
+    title: "Digital Graphics & Design",
+    icon: <Palette className="h-6 w-6" />,
+    plans: [
+      { plan: "Logo & Branding Kit", price: "$250+", includes: "Custom logo design, color palette, typography guidelines" },
+      { plan: "Social Media Pack", price: "$150/month", includes: "10 social media graphics, post templates, profile banners" },
+      { plan: "Presentation Design", price: "$400+", includes: "Custom PowerPoint/Google Slides template, up to 20 slides" },
+    ],
+    addOns: "Custom illustrations ($50/hr), UI/UX mockups (Custom Quote)",
   },
   cyberSecurity: {
     title: "Cyber Security",
@@ -131,6 +141,7 @@ export default function PricingPage() {
             <PricingSection section={pricingData.ai} />
             <PricingSection section={pricingData.training} />
             <PricingSection section={pricingData.data} />
+            <PricingSection section={pricingData.digitalGraphics} />
             <PricingSection section={pricingData.cyberSecurity} />
             <PricingSection section={pricingData.maintenance} />
         </div>
