@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -7,14 +8,14 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet"
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useAuth } from "@/hooks/use-auth"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-const navLinks = [
+const allNavLinks = [
   { href: "/services", label: "Services" },
   { href: "/portfolio", label: "Case Studies" },
   { href: "/products", label: "Products" },
@@ -28,7 +29,14 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading } = useAuth()
+
+  const navLinks = allNavLinks.filter(link => {
+    if (link.href === '/pricing') {
+      return !loading && !!user;
+    }
+    return true;
+  });
 
   const NavLink = ({ href, label, isMobile = false }: { href:string; label:string; isMobile?: boolean }) => (
     <Link

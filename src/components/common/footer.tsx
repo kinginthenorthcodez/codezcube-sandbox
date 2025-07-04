@@ -1,12 +1,27 @@
+"use client"
+
 import { Logo } from "@/components/logo"
 import { Github, Linkedin, Twitter } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getSiteConfiguration } from "@/lib/actions"
+import { useAuth } from "@/hooks/use-auth"
+import React, { useEffect, useState } from "react"
+import { type SiteConfiguration } from "@/types"
 
-export async function Footer() {
-  const config = await getSiteConfiguration();
-  const { github, twitter, linkedin } = config.socialLinks;
+export function Footer() {
+  const { user, loading } = useAuth();
+  const [config, setConfig] = useState<SiteConfiguration | null>(null);
+
+  useEffect(() => {
+    async function fetchConfig() {
+      const siteConfig = await getSiteConfiguration();
+      setConfig(siteConfig);
+    }
+    fetchConfig();
+  }, []);
+
+  const { github, twitter, linkedin } = config?.socialLinks || { github: '#', twitter: '#', linkedin: '#' };
 
   return (
     <footer className="border-t">
@@ -17,23 +32,25 @@ export async function Footer() {
             <p className="text-sm text-muted-foreground">
               Innovating the Next. Empowering the Now.
             </p>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href={github} aria-label="Github" target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
-                <Link href={twitter} aria-label="Twitter" target="_blank" rel="noopener noreferrer">
-                  <Twitter className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
-                <Link href={linkedin} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+            {config && (
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={github} aria-label="Github" target="_blank" rel="noopener noreferrer">
+                    <Github className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={twitter} aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                    <Twitter className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={linkedin} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                    <Linkedin className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-8 text-center md:col-span-8 md:grid-cols-3 md:text-left">
             <div>
@@ -43,7 +60,7 @@ export async function Footer() {
                 <li><Link href="/portfolio" className="text-sm text-muted-foreground hover:text-primary">Case Studies</Link></li>
                 <li><Link href="/blog" className="text-sm text-muted-foreground hover:text-primary">Blog</Link></li>
                 <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
-                <li><Link href="/admin" className="text-sm text-muted-foreground hover:text-primary">Admin</Link></li>
+                {!loading && user && <li><Link href="/admin" className="text-sm text-muted-foreground hover:text-primary">Admin</Link></li>}
               </ul>
             </div>
             <div>
@@ -51,7 +68,7 @@ export async function Footer() {
               <ul className="space-y-2">
                 <li><Link href="/products" className="text-sm text-muted-foreground hover:text-primary">Products</Link></li>
                 <li><Link href="/courses" className="text-sm text-muted-foreground hover:text-primary">Courses & Career</Link></li>
-                <li><Link href="/pricing" className="text-sm text-muted-foreground hover:text-primary">Pricing</Link></li>
+                {!loading && user && <li><Link href="/pricing" className="text-sm text-muted-foreground hover:text-primary">Pricing</Link></li>}
               </ul>
             </div>
              <div className="col-span-2 md:col-span-1">
