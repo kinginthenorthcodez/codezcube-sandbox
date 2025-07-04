@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Header } from '@/components/common/header';
 import { Footer } from '@/components/common/footer';
 import { AuthProvider } from '@/hooks/use-auth';
+import { AuthProtector } from '@/components/auth-protector';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -38,11 +39,13 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
           >
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <AuthProtector>
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+            </AuthProtector>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
