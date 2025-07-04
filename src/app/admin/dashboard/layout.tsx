@@ -3,9 +3,11 @@
 
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from '@/components/ui/sidebar';
 import { Settings, Home, Blocks, Users, LayoutDashboard, MessageSquareQuote, LayoutTemplate, Share2, LayoutGrid, Package, GraduationCap, Newspaper } from 'lucide-react';
-import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <SidebarProvider>
       <div className="flex min-h-[calc(100vh-4rem)] bg-secondary/20">
@@ -21,67 +23,67 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#info" tooltip={{children: "Welcome"}}>
+                <SidebarMenuButton href="/admin/dashboard" tooltip={{children: "Welcome"}} isActive={pathname === '/admin/dashboard'}>
                   <Home />
                   Welcome
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#site-config" tooltip={{children: "Site Configuration"}}>
+                <SidebarMenuButton href="/admin/dashboard/site-configuration" tooltip={{children: "Site Configuration"}} isActive={pathname === '/admin/dashboard/site-configuration'}>
                   <Share2 />
                   Site Configuration
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton href="#content" tooltip={{children: "Homepage Content"}}>
+                <SidebarMenuButton href="/admin/dashboard/homepage-content" tooltip={{children: "Homepage Content"}} isActive={pathname === '/admin/dashboard/homepage-content'}>
                   <LayoutTemplate />
                   Homepage Content
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton href="#stats" tooltip={{children: "Homepage Stats"}}>
+                <SidebarMenuButton href="/admin/dashboard/homepage-stats" tooltip={{children: "Homepage Stats"}} isActive={pathname === '/admin/dashboard/homepage-stats'}>
                   <Settings />
                   Homepage Stats
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#services" tooltip={{children: "Core Services"}}>
+                <SidebarMenuButton href="/admin/dashboard/services" tooltip={{children: "Core Services"}} isActive={pathname === '/admin/dashboard/services'}>
                   <Blocks />
                   Core Services
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#portfolio" tooltip={{children: "Portfolio"}}>
+                <SidebarMenuButton href="/admin/dashboard/portfolio" tooltip={{children: "Portfolio"}} isActive={pathname === '/admin/dashboard/portfolio'}>
                   <LayoutGrid />
                   Portfolio
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#products" tooltip={{children: "Products"}}>
+                <SidebarMenuButton href="/admin/dashboard/products" tooltip={{children: "Products"}} isActive={pathname === '/admin/dashboard/products'}>
                   <Package />
                   Products
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#courses" tooltip={{children: "Courses"}}>
+                <SidebarMenuButton href="/admin/dashboard/courses" tooltip={{children: "Courses"}} isActive={pathname === '/admin/dashboard/courses'}>
                   <GraduationCap />
                   Courses
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton href="#blog" tooltip={{children: "Blog"}}>
+                <SidebarMenuButton href="/admin/dashboard/blog" tooltip={{children: "Blog"}} isActive={pathname === '/admin/dashboard/blog'}>
                   <Newspaper />
                   Blog
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#clients" tooltip={{children: "Clients"}}>
+                <SidebarMenuButton href="/admin/dashboard/clients" tooltip={{children: "Clients"}} isActive={pathname === '/admin/dashboard/clients'}>
                   <Users />
                   Clients
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#testimonials" tooltip={{children: "Testimonials"}}>
+                <SidebarMenuButton href="/admin/dashboard/testimonials" tooltip={{children: "Testimonials"}} isActive={pathname === '/admin/dashboard/testimonials'}>
                   <MessageSquareQuote />
                   Testimonials
                 </SidebarMenuButton>
