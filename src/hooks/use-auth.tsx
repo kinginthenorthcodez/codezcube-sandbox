@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   GithubAuthProvider,
-  signInWithPopup
+  signInWithRedirect
 } from 'firebase/auth';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("Firebase is not configured.");
     }
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   };
   
   const signInWithGitHub = async () => {
@@ -100,7 +101,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("Firebase is not configured.");
     }
     const provider = new GithubAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   };
 
   const signOut = async () => {
