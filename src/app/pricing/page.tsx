@@ -1,4 +1,8 @@
+"use client"
 
+import { useRef } from "react";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -119,9 +123,40 @@ const PricingSection = ({ section }: { section: (typeof pricingData)[keyof typeo
 );
 
 export default function PricingPage() {
+  const pricingCardRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPdf = () => {
+    const input = pricingCardRef.current;
+    if (input) {
+      // Temporarily hide the button from the PDF output
+      const button = input.querySelector<HTMLElement>('#download-button');
+      if (button) {
+        button.style.display = 'none';
+      }
+
+      html2canvas(input, { scale: 2, useCORS: true })
+        .then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'px',
+            format: [canvas.width, canvas.height],
+          });
+          pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+          pdf.save('CodezCube-Pricing.pdf');
+
+          // Show the button again after the PDF is generated
+          if (button) {
+            button.style.display = 'flex';
+          }
+      });
+    }
+  };
+
+
   return (
     <div className="container py-16 md:py-24">
-      <Card className="p-6 md:p-8">
+      <Card className="p-6 md:p-8" ref={pricingCardRef}>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div className="flex items-start gap-4">
                 <div className="hidden sm:block bg-primary/10 text-primary p-3 rounded-full mt-1">
@@ -134,7 +169,7 @@ export default function PricingPage() {
                     </p>
                 </div>
             </div>
-            <Button variant="outline" className="w-full md:w-auto flex-shrink-0">
+            <Button id="download-button" onClick={handleDownloadPdf} variant="outline" className="w-full md:w-auto flex-shrink-0">
                 <Download className="mr-2" />
                 Download PDF
             </Button>
