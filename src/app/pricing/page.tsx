@@ -53,8 +53,12 @@ const pricingData = {
       { plan: "Logo & Branding Kit", price: "$250+", includes: "Custom logo design, color palette, typography guidelines" },
       { plan: "Social Media Pack", price: "$150/month", includes: "10 social media graphics, post templates, profile banners" },
       { plan: "Presentation Design", price: "$400+", includes: "Custom PowerPoint/Google Slides template, up to 20 slides" },
+      { plan: "UI/UX Visual Design", price: "Custom Quote", includes: "High-fidelity mockups and visual design for applications and websites" },
+      { plan: "Print Layout", price: "Custom Quote", includes: "Brochures, flyers, business cards, and other print materials" },
+      { plan: "Custom Illustrations", price: "Custom Quote", includes: "Unique illustrations for web, print, or branding purposes" },
+      { plan: "Packaging Design", price: "Custom Quote", includes: "Creative packaging concepts and final artwork for your products" },
     ],
-    addOns: "Custom illustrations ($50/hr), UI/UX mockups (Custom Quote)",
+    addOns: "",
   },
   cyberSecurity: {
     title: "Cyber Security",
