@@ -437,13 +437,22 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      return { 
-        ...defaultSiteConfig,
-        ...data,
-        socialLinks: { ...defaultSiteConfig.socialLinks, ...data.socialLinks },
-        contactInfo: { ...defaultSiteConfig.contactInfo, ...data.contactInfo },
+      const mergedConfig = {
+          ...defaultSiteConfig,
+          ...data,
+          socialLinks: { ...defaultSiteConfig.socialLinks, ...(data.socialLinks || {}) },
+          contactInfo: { ...defaultSiteConfig.contactInfo, ...(data.contactInfo || {}) },
       };
+      
+      // Ensure policy fields are strings to prevent issues with form controls and validation
+      mergedConfig.privacyPolicy = mergedConfig.privacyPolicy || '';
+      mergedConfig.termsOfService = mergedConfig.termsOfService || '';
+      mergedConfig.cookiePolicy = mergedConfig.cookiePolicy || '';
+
+      return mergedConfig;
     } else {
+      // If no config exists, create one with defaults to prevent future errors.
+      await setDoc(docRef, defaultSiteConfig);
       return defaultSiteConfig;
     }
   } catch (error) {
