@@ -22,7 +22,11 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'CodezCube - Innovation & Technology Solutions',
+  metadataBase: new URL('https://codezcube.com'), // Change this to your production domain
+  title: {
+    default: 'CodezCube - Innovation & Technology Solutions',
+    template: '%s | CodezCube',
+  },
   description: 'CodezCube is a hybrid innovation company offering web/IT services and a long-term product incubation lab.',
   icons: {
     icon: '/favicon.ico',

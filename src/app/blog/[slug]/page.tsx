@@ -8,12 +8,40 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { Metadata } from 'next';
 
 export async function generateStaticParams() {
     const posts = await getBlogPosts();
     return posts.map((post) => ({
         slug: post.slug,
     }));
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getBlogPostBySlug(params.slug);
+
+  if (!post) {
+    return {
+      title: 'Post Not Found',
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: [
+        {
+          url: post.imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {

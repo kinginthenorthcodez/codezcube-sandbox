@@ -7,12 +7,40 @@ import { ArrowLeft, Clock, BarChart, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from 'next';
 
 export async function generateStaticParams() {
     const courses = await getCourses();
     return courses.map((course) => ({
         slug: course.slug,
     }));
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const course = await getCourseBySlug(params.slug);
+
+  if (!course) {
+    return {
+      title: 'Course Not Found',
+    };
+  }
+
+  return {
+    title: course.title,
+    description: course.description,
+    openGraph: {
+      title: course.title,
+      description: course.description,
+      images: [
+        {
+          url: course.imageUrl,
+          width: 1200,
+          height: 630,
+          alt: course.title,
+        },
+      ],
+    },
+  };
 }
 
 export default async function CourseDetailPage({ params }: { params: { slug: string } }) {

@@ -3,19 +3,47 @@ import { getPortfolioProjectBySlug, getPortfolioProjects } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Tag, Clock, ClipboardList, AlertTriangle, Heart, FileText, Lightbulb, PenTool, CheckSquare, Palette } from "lucide-react";
+import { ArrowLeft, Tag, Clock, ClipboardList, AlertTriangle, Heart, FileText, Lightbulb, PenTool, CheckSquare, Palette, User } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import type { Metadata } from 'next';
 
 export async function generateStaticParams() {
     const projects = await getPortfolioProjects();
     return projects.map((project) => ({
         slug: project.slug,
     }));
+}
+
+export async function generateMetadata({ params }: { params: { slug:string } }): Promise<Metadata> {
+  const project = await getPortfolioProjectBySlug(params.slug);
+
+  if (!project) {
+    return {
+      title: 'Project Not Found',
+    };
+  }
+
+  return {
+    title: project.title,
+    description: project.description,
+    openGraph: {
+      title: project.title,
+      description: project.description,
+      images: [
+        {
+          url: project.imageUrl,
+          width: 1200,
+          height: 630,
+          alt: project.title,
+        },
+      ],
+    },
+  };
 }
 
 const Section = ({ icon: Icon, title, children, className }: { icon?: React.ElementType; title: string; children: React.ReactNode; className?: string }) => {
