@@ -1,12 +1,14 @@
 
-import { getPortfolioProjectBySlug, getPortfolioProjects, getClients } from "@/lib/actions";
+import { getPortfolioProjectBySlug, getPortfolioProjects } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Search, MessageSquare, Award, CheckCircle } from "lucide-react";
+import { ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export async function generateStaticParams() {
     const projects = await getPortfolioProjects();
@@ -15,181 +17,145 @@ export async function generateStaticParams() {
     }));
 }
 
+const CaseStudySection = ({ title, children }: { title: string; children: React.ReactNode }) => {
+    if (!children || (typeof children === 'string' && !children.trim())) {
+        return null;
+    }
+    return (
+        <div className="mb-12">
+            <h2 className="text-3xl font-bold tracking-tight mb-6 text-primary">{title}</h2>
+            <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground space-y-4">
+                {children}
+            </div>
+        </div>
+    );
+};
+
+const Paragraphs = ({ text }: { text: string | undefined }) => {
+    if (!text?.trim()) return null;
+    return <>{text.split('\n').filter(p => p.trim()).map((p, i) => <p key={i}>{p}</p>)}</>;
+};
+
 export default async function PortfolioDetailPage({ params }: { params: { slug: string } }) {
     const project = await getPortfolioProjectBySlug(params.slug);
-    const clients = await getClients();
 
     if (!project) {
         notFound();
     }
     
-    const keyFeatures = [
-        { icon: <Search className="w-8 h-8 text-primary" />, title: "Discover", description: "In-depth discovery phase to understand user needs and define a clear project roadmap, ensuring the final product is both beautiful and functional." },
-        { icon: <MessageSquare className="w-8 h-8 text-primary" />, title: "Comment", description: "Iterative design and development process with constant feedback loops, allowing for collaborative refinement and alignment with client goals." },
-        { icon: <Award className="w-8 h-8 text-primary" />, title: "Win Awards", description: "Focus on delivering award-winning, high-quality solutions that stand out in the market and provide a tangible return on investment." },
-    ];
-
     return (
-        <div className="bg-background">
-            <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center text-center text-primary-foreground">
-                <Image
-                    src={project.imageUrl || 'https://placehold.co/1920x1080.png'}
+        <div className="container max-w-5xl py-16 md:py-24">
+            <div className="mb-8">
+                <Button asChild variant="outline" size="sm">
+                    <Link href="/portfolio">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Back to Portfolio
+                    </Link>
+                </Button>
+            </div>
+            
+            <header className="space-y-4 mb-12 text-center">
+                <Badge variant="secondary">{project.category}</Badge>
+                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl lg:text-6xl">{project.title}</h1>
+                <p className="max-w-3xl mx-auto text-muted-foreground md:text-xl">{project.description}</p>
+            </header>
+
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-16 shadow-lg">
+                <Image 
+                    src={project.imageUrl || 'https://placehold.co/1200x600.png'}
                     alt={project.title}
                     fill
                     className="object-cover"
-                    data-ai-hint="abstract background"
+                    data-ai-hint="project hero"
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
-                <div className="relative z-10 container px-4 space-y-4">
-                    <Badge variant="secondary" className="text-base">{project.category}</Badge>
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tighter">{project.title}</h1>
-                    <p className="text-xl md:text-2xl text-primary-foreground/80 max-w-3xl mx-auto">{project.description}</p>
-                    <div className="mt-8">
-                         <Button asChild>
-                            <Link href="/portfolio">
-                                <ArrowLeft className="mr-2" />
-                                Back to Portfolio
-                            </Link>
-                        </Button>
-                    </div>
-                </div>
-            </section>
+            </div>
             
-            <section className="-mt-32 relative z-20 pb-16 md:pb-24">
-                <div className="container">
-                    <Image
-                        src="https://placehold.co/1200x600.png"
-                        width={1200}
-                        height={600}
-                        alt="Project Mockups on devices"
-                        className="rounded-lg shadow-2xl"
-                        data-ai-hint="app mockup tablet phone"
-                    />
-                </div>
-            </section>
+            <article>
+                <CaseStudySection title="Problem Statement & Solution">
+                    <Paragraphs text={project.problemStatement} />
+                </CaseStudySection>
 
-            <section className="py-16 md:py-24 bg-secondary/50">
-                <div className="container text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Showcasing Gorgeous Photography</h2>
-                    <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-16">
-                        {project.problemStatement || "The core challenge was to create a platform that not only displays high-quality photography but also fosters a community of creators through engagement and recognition."}
-                    </p>
-                    <div className="grid md:grid-cols-3 gap-12">
-                        {keyFeatures.map(feature => (
-                            <div key={feature.title} className="flex flex-col items-center">
-                                <div className="p-4 bg-background rounded-full mb-4 shadow-md">{feature.icon}</div>
-                                <h3 className="text-2xl font-bold mb-2">{feature.title}</h3>
-                                <p className="text-muted-foreground">{feature.description}</p>
-                            </div>
-                        ))}
-                    </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 my-16">
+                    {project.targetAudience && <Card><CardHeader><CardTitle>Target Audience</CardTitle></CardHeader><CardContent><Paragraphs text={project.targetAudience} /></CardContent></Card>}
+                    {project.myRole && <Card><CardHeader><CardTitle>My Role</CardTitle></CardHeader><CardContent><Paragraphs text={project.myRole} /></CardContent></Card>}
+                    {project.projectTimeline && <Card className="md:col-span-2 lg:col-span-1"><CardHeader><CardTitle>Project Timeline</CardTitle></CardHeader><CardContent><Paragraphs text={project.projectTimeline} /></CardContent></Card>}
                 </div>
-            </section>
-            
-            <section className="py-16 md:py-24">
-                <div className="container grid lg:grid-cols-2 gap-12 items-center">
-                    <div>
-                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Photography Matters</h2>
-                         <p className="text-lg text-muted-foreground">
-                            {project.designThinkingProcess || "We focused on a clean, minimal UI that puts the photography front and center. The interface is designed to be intuitive, allowing users to browse, vote, and upload with ease, ensuring the art is always the hero."}
-                         </p>
-                    </div>
-                    <Image
-                        src={"https://placehold.co/800x600.png"}
-                        width={800}
-                        height={600}
-                        alt="Photography showcase"
-                        className="rounded-lg shadow-xl"
-                        data-ai-hint="photo collage"
-                    />
-                </div>
-            </section>
+                
+                <CaseStudySection title="Design Thinking Process">
+                    <Paragraphs text={project.designThinkingProcess} />
+                </CaseStudySection>
 
-            <section className="py-16 md:py-24 bg-secondary/50">
-                <div className="container grid lg:grid-cols-2 gap-12 items-center">
-                     <div className="flex justify-center">
-                         <Image
-                            src="https://placehold.co/300x600.png"
-                            width={300}
-                            height={600}
-                            alt="Mobile voting screen"
-                            className="rounded-2xl shadow-2xl"
-                            data-ai-hint="mobile app screen"
-                         />
-                     </div>
-                     <div className="lg:order-first">
-                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Making Voting Pleasurable</h2>
-                         <p className="text-lg text-muted-foreground mb-8">
-                            {project.taskFlow || "The voting process was simplified to a single tap, creating an engaging and addictive user experience. We designed a clear and simple flow to encourage participation."}
-                         </p>
-                         <ul className="space-y-4">
-                            <li className="flex items-start gap-3"><CheckCircle className="h-6 w-6 text-primary flex-shrink-0" /><span>Intuitive one-tap voting system.</span></li>
-                            <li className="flex items-start gap-3"><CheckCircle className="h-6 w-6 text-primary flex-shrink-0" /><span>Real-time leaderboards and ranking.</span></li>
-                            <li className="flex items-start gap-3"><CheckCircle className="h-6 w-6 text-primary flex-shrink-0" /><span>Seamless sharing to social media.</span></li>
-                         </ul>
-                     </div>
-                </div>
-            </section>
+                <CaseStudySection title="Qualitative Research">
+                    <Paragraphs text={project.qualitativeResearch} />
+                </CaseStudySection>
 
-             <section className="py-16 md:py-24">
-                <div className="container text-center">
-                     <h2 className="text-3xl md:text-4xl font-bold mb-4">Seamless Across Mobile and Web</h2>
-                     <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-12">
-                        {project.highFidelityPrototypes || "A consistent and beautiful user experience was crafted for both mobile and desktop, ensuring accessibility and ease of use no matter the device."}
-                    </p>
-                    <Image
-                        src="https://placehold.co/1200x600.png"
-                        width={1200}
-                        height={600}
-                        alt="Desktop and Mobile Mockups"
-                        className="rounded-lg shadow-xl"
-                        data-ai-hint="desktop app screen"
-                    />
-                </div>
-            </section>
+                <CaseStudySection title="Quantitative Research">
+                    <Paragraphs text={project.quantitativeResearch} />
+                </CaseStudySection>
+                
+                <CaseStudySection title="User Persona">
+                    <Paragraphs text={project.userPersona} />
+                </CaseStudySection>
 
-            <section className="py-16 md:py-24 bg-secondary/50">
-                <div className="container text-center">
-                    <h3 className="text-2xl font-semibold mb-6">Technologies Used</h3>
-                    <div className="flex flex-wrap gap-3 justify-center">
-                        {project.tags.map((tag, index) => (
-                            <Badge key={index} variant="outline" className="text-lg px-4 py-1">{tag}</Badge>
-                        ))}
-                    </div>
-                </div>
-            </section>
-            
-            {clients.length > 0 && (
-                 <section className="py-16 md:py-24 bg-gray-900 text-gray-400">
-                    <div className="container">
-                        <h3 className="text-center text-xl font-semibold mb-8">Trusted by industry leaders</h3>
-                        <div className="flex items-center justify-center gap-x-12 gap-y-8 flex-wrap">
-                          {clients.map((client) => (
-                            <div key={client.id} title={client.name}>
-                              <Image
-                                src={client.logoUrl}
-                                alt={`${client.name} Logo`}
-                                width={140}
-                                height={50}
-                                className="object-contain grayscale invert hover:grayscale-0 hover:invert-0 opacity-70 hover:opacity-100 transition-all duration-300"
-                                data-ai-hint={client.dataAiHint}
-                              />
-                            </div>
-                          ))}
+                <CaseStudySection title="Empathy Map">
+                    <Paragraphs text={project.empathyMap} />
+                </CaseStudySection>
+
+                <CaseStudySection title="Task Flow">
+                    <Paragraphs text={project.taskFlow} />
+                </CaseStudySection>
+                
+                <CaseStudySection title="Card Sorting">
+                    <Paragraphs text={project.cardSorting} />
+                </CaseStudySection>
+
+                <CaseStudySection title="Information Architecture">
+                    <Paragraphs text={project.informationArchitecture} />
+                </CaseStudySection>
+
+                <CaseStudySection title="High-Fidelity Prototypes">
+                    <Paragraphs text={project.highFidelityPrototypes} />
+                </CaseStudySection>
+                
+                <CaseStudySection title="Typography & Colors">
+                    <Paragraphs text={project.typographyAndColors} />
+                </CaseStudySection>
+
+                <CaseStudySection title="Visual Designs">
+                    <Paragraphs text={project.visualDesigns} />
+                </CaseStudySection>
+                
+                <Separator className="my-16" />
+
+                {project.tags && project.tags.length > 0 && (
+                    <div className="mb-12">
+                        <h3 className="text-2xl font-bold mb-4">Technologies & Tags</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {project.tags.map((tag) => (
+                                <Badge key={tag} variant="secondary" className="text-base py-1 px-3">
+                                    <Tag className="mr-2 h-4 w-4"/>
+                                    {tag}
+                                </Badge>
+                            ))}
                         </div>
                     </div>
-                </section>
-            )}
+                )}
+
+                <CaseStudySection title="A Final Word">
+                    <Paragraphs text={project.thankYouNote} />
+                </CaseStudySection>
+
+            </article>
 
             <div className="mt-16 text-center border-t pt-12">
-                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Have a Similar Project?</h2>
-                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg my-4">
-                     Let's discuss how our expertise can bring your vision to life.
-                 </p>
-                 <Button asChild size="lg">
-                     <Link href="/contact">Get in Touch</Link>
-                 </Button>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Have a Similar Project?</h2>
+                <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg my-4">
+                    Let's discuss how our expertise can bring your vision to life.
+                </p>
+                <Button asChild size="lg">
+                    <Link href="/contact">Get in Touch</Link>
+                </Button>
             </div>
         </div>
     );
