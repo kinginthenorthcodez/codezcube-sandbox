@@ -8,7 +8,7 @@ import * as z from "zod";
 import { getSiteConfiguration, updateSiteConfiguration } from "@/lib/actions";
 import { type SiteConfiguration } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -196,6 +196,7 @@ export function SiteConfigurationManager() {
                       <FormControl>
                         <Textarea className="min-h-[200px]" placeholder="Enter your full privacy policy text..." {...field} />
                       </FormControl>
+                      <FormDescription>You can use Markdown for formatting.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -209,6 +210,7 @@ export function SiteConfigurationManager() {
                       <FormControl>
                         <Textarea className="min-h-[200px]" placeholder="Enter your full terms of service text..." {...field} />
                       </FormControl>
+                      <FormDescription>You can use Markdown for formatting.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -222,6 +224,7 @@ export function SiteConfigurationManager() {
                       <FormControl>
                         <Textarea className="min-h-[200px]" placeholder="Enter your full cookie policy text..." {...field} />
                       </FormControl>
+                      <FormDescription>You can use Markdown for formatting.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

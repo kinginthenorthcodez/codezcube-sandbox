@@ -1,6 +1,8 @@
 
 import { getSiteConfiguration } from "@/lib/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default async function TermsOfServicePage() {
   const config = await getSiteConfiguration();
@@ -13,7 +15,9 @@ export default async function TermsOfServicePage() {
         </CardHeader>
         <CardContent>
           <div className="prose prose-lg dark:prose-invert max-w-none mx-auto">
-            {config.termsOfService?.split('\n').filter(p => p.trim() !== '').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {config.termsOfService}
+            </ReactMarkdown>
           </div>
         </CardContent>
       </Card>
