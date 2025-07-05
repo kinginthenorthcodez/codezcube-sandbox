@@ -90,6 +90,31 @@ async function handleDeleteFile(storagePath: string) {
     }
 }
 
+async function handleMultipleFileUploads(files: File[], path: string): Promise<{ url: string, storagePath: string }[]> {
+    if (!storage) throw new Error("Firebase Storage is not initialized.");
+    const uploadPromises = files.map(file => {
+        const storageRef = ref(storage, `${path}/${Date.now()}-${file.name}`);
+        return uploadBytes(storageRef, file).then(snapshot => 
+            getDownloadURL(snapshot.ref).then(url => ({ url, storagePath: snapshot.ref.fullPath }))
+        );
+    });
+    return Promise.all(uploadPromises);
+}
+
+async function handleDeleteMultipleFiles(images: { imageStoragePath: string }[] | undefined) {
+    if (!storage || !images || images.length === 0) return;
+    const deletePromises = images.map(img => {
+        if (!img.imageStoragePath) return Promise.resolve();
+        const fileRef = ref(storage, img.imageStoragePath);
+        return deleteObject(fileRef).catch(error => {
+            if (error.code !== 'storage/object-not-found') {
+                console.error("Error deleting file from storage:", error);
+            }
+        });
+    });
+    await Promise.all(deletePromises);
+}
+
 export async function addService(formData: FormData): Promise<{ success: boolean; message: string }> {
     if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
 
@@ -507,8 +532,10 @@ const mapDocToProject = (doc: QueryDocumentSnapshot | DocumentSnapshot): Portfol
         cardSorting: data.cardSorting || '',
         informationArchitecture: data.informationArchitecture || '',
         highFidelityPrototypes: data.highFidelityPrototypes || '',
+        highFidelityPrototypesImages: data.highFidelityPrototypesImages || [],
         typographyAndColors: data.typographyAndColors || '',
         visualDesigns: data.visualDesigns || '',
+        visualDesignsImages: data.visualDesignsImages || [],
         thankYouNote: data.thankYouNote || '',
     };
 };
@@ -544,14 +571,20 @@ export async function getPortfolioProjectBySlug(slug: string): Promise<Portfolio
 export async function addPortfolioProject(formData: FormData): Promise<{ success: boolean; message: string }> {
     if (!db || !storage) return { success: false, message: 'Firebase is not initialized.' };
 
-    const imageFile = formData.get('imageFile') as File;
-    if (!imageFile || imageFile.size === 0) {
-        return { success: false, message: 'Project image is required.' };
-    }
-
     try {
+        const imageFile = formData.get('imageFile') as File;
+        if (!imageFile || imageFile.size === 0) {
+            return { success: false, message: 'Project image is required.' };
+        }
         const { url, storagePath } = await handleFileUpload(imageFile, 'portfolio-images');
-        const newProject = {
+
+        const highFidelityFiles = formData.getAll('highFidelityPrototypesImagesFile') as File[];
+        const visualDesignsFiles = formData.getAll('visualDesignsImagesFile') as File[];
+
+        const highFidelityPrototypesImages = highFidelityFiles[0]?.size > 0 ? await handleMultipleFileUploads(highFidelityFiles, 'portfolio-images/hf-prototypes') : [];
+        const visualDesignsImages = visualDesignsFiles[0]?.size > 0 ? await handleMultipleFileUploads(visualDesignsFiles, 'portfolio-images/visual-designs') : [];
+        
+        const newProject: Omit<PortfolioProject, 'id'> = {
             title: formData.get('title') as string,
             slug: formData.get('slug') as string,
             category: formData.get('category') as string,
@@ -573,8 +606,10 @@ export async function addPortfolioProject(formData: FormData): Promise<{ success
             cardSorting: formData.get('cardSorting') as string,
             informationArchitecture: formData.get('informationArchitecture') as string,
             highFidelityPrototypes: formData.get('highFidelityPrototypes') as string,
+            highFidelityPrototypesImages,
             typographyAndColors: formData.get('typographyAndColors') as string,
             visualDesigns: formData.get('visualDesigns') as string,
+            visualDesignsImages,
             thankYouNote: formData.get('thankYouNote') as string,
         };
 
@@ -583,7 +618,8 @@ export async function addPortfolioProject(formData: FormData): Promise<{ success
         revalidatePath('/portfolio');
         return { success: true, message: 'Project added successfully.' };
     } catch (error) {
-        return { success: false, message: 'Failed to add project.' };
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return { success: false, message: `Failed to add project: ${errorMessage}` };
     }
 }
 
@@ -629,13 +665,26 @@ export async function updatePortfolioProject(id: string, formData: FormData): Pr
             projectUpdate.imageStoragePath = storagePath;
         }
 
+        const highFidelityFiles = formData.getAll('highFidelityPrototypesImagesFile') as File[];
+        if (highFidelityFiles.length > 0 && highFidelityFiles[0].size > 0) {
+            await handleDeleteMultipleFiles(existingProject.highFidelityPrototypesImages);
+            projectUpdate.highFidelityPrototypesImages = await handleMultipleFileUploads(highFidelityFiles, 'portfolio-images/hf-prototypes');
+        }
+
+        const visualDesignsFiles = formData.getAll('visualDesignsImagesFile') as File[];
+        if (visualDesignsFiles.length > 0 && visualDesignsFiles[0].size > 0) {
+            await handleDeleteMultipleFiles(existingProject.visualDesignsImages);
+            projectUpdate.visualDesignsImages = await handleMultipleFileUploads(visualDesignsFiles, 'portfolio-images/visual-designs');
+        }
+
         await updateDoc(docRef, projectUpdate);
         revalidatePath('/admin/dashboard');
         revalidatePath('/portfolio');
         revalidatePath(`/portfolio/${projectUpdate.slug}`);
         return { success: true, message: 'Project updated successfully.' };
     } catch (error) {
-        return { success: false, message: 'Failed to update project.' };
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return { success: false, message: `Failed to update project: ${errorMessage}` };
     }
 }
 
@@ -645,7 +694,10 @@ export async function deletePortfolioProject(id: string): Promise<{ success: boo
         const docRef = doc(db, 'portfolio', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            await handleDeleteFile(docSnap.data().imageStoragePath);
+            const projectData = docSnap.data() as PortfolioProject;
+            await handleDeleteFile(projectData.imageStoragePath);
+            await handleDeleteMultipleFiles(projectData.highFidelityPrototypesImages);
+            await handleDeleteMultipleFiles(projectData.visualDesignsImages);
         }
         await deleteDoc(docRef);
         revalidatePath('/admin/dashboard');

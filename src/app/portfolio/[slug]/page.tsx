@@ -21,6 +21,24 @@ const CaseStudySection = ({ title, children }: { title: string; children: React.
     if (!children || (typeof children === 'string' && !children.trim())) {
         return null;
     }
+    const childrenArray = React.Children.toArray(children);
+    const hasContent = childrenArray.some(child => {
+        if (React.isValidElement(child) && child.props.text) {
+            return child.props.text.trim() !== '';
+        }
+        if (React.isValidElement(child) && child.props.project?.highFidelityPrototypesImages) {
+             return child.props.project.highFidelityPrototypesImages.length > 0;
+        }
+         if (React.isValidElement(child) && child.props.project?.visualDesignsImages) {
+             return child.props.project.visualDesignsImages.length > 0;
+        }
+        return false;
+    });
+
+    if (!hasContent) {
+        return null;
+    }
+
     return (
         <div className="mb-12">
             <h2 className="text-3xl font-bold tracking-tight mb-6 text-primary">{title}</h2>
@@ -116,6 +134,20 @@ export default async function PortfolioDetailPage({ params }: { params: { slug: 
 
                 <CaseStudySection title="High-Fidelity Prototypes">
                     <Paragraphs text={project.highFidelityPrototypes} />
+                    {project.highFidelityPrototypesImages && project.highFidelityPrototypesImages.length > 0 && (
+                        <div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
+                            {project.highFidelityPrototypesImages.map((image, index) => (
+                                <div key={index} className="relative aspect-video rounded-lg overflow-hidden shadow-lg">
+                                    <Image
+                                        src={image.imageUrl}
+                                        alt={`High-Fidelity Prototype ${index + 1}`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </CaseStudySection>
                 
                 <CaseStudySection title="Typography & Colors">
@@ -124,6 +156,20 @@ export default async function PortfolioDetailPage({ params }: { params: { slug: 
 
                 <CaseStudySection title="Visual Designs">
                     <Paragraphs text={project.visualDesigns} />
+                     {project.visualDesignsImages && project.visualDesignsImages.length > 0 && (
+                        <div className="not-prose grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
+                            {project.visualDesignsImages.map((image, index) => (
+                                <div key={index} className="relative aspect-video rounded-lg overflow-hidden shadow-lg">
+                                    <Image
+                                        src={image.imageUrl}
+                                        alt={`Visual Design ${index + 1}`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </CaseStudySection>
                 
                 <Separator className="my-16" />

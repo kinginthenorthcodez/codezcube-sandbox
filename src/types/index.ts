@@ -51,8 +51,10 @@ export type PortfolioProject = {
   cardSorting: string;
   informationArchitecture: string;
   highFidelityPrototypes: string;
+  highFidelityPrototypesImages?: { imageUrl: string; imageStoragePath: string }[];
   typographyAndColors: string;
   visualDesigns: string;
+  visualDesignsImages?: { imageUrl: string; imageStoragePath: string }[];
   thankYouNote: string;
 };
 

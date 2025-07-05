@@ -30,10 +30,7 @@ const projectSchema = z.object({
     description: z.string().min(10, "Short description must be at least 10 characters."),
     tags: z.string().min(1, "Please provide at least one tag."),
     order: z.coerce.number().int().min(0),
-    imageFile: z.any()
-        .optional()
-        .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
-        .refine((files) => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), "Only .jpg, .jpeg, .png, .svg and .webp formats are supported."),
+    imageFile: z.any().optional(),
     problemStatement: z.string().optional(),
     targetAudience: z.string().optional(),
     myRole: z.string().optional(),
@@ -47,10 +44,13 @@ const projectSchema = z.object({
     cardSorting: z.string().optional(),
     informationArchitecture: z.string().optional(),
     highFidelityPrototypes: z.string().optional(),
+    highFidelityPrototypesImagesFile: z.any().optional(),
     typographyAndColors: z.string().optional(),
     visualDesigns: z.string().optional(),
+    visualDesignsImagesFile: z.any().optional(),
     thankYouNote: z.string().optional(),
 });
+
 
 type ProjectFormData = z.infer<typeof projectSchema>;
 
@@ -69,7 +69,8 @@ function ProjectFormDialog({
 
   const defaultValues = React.useMemo(() => {
     const baseProject = {
-      title: "", slug: "", category: "", description: "", tags: "", order: 0, imageFile: undefined,
+      title: "", slug: "", category: "", description: "", tags: "", order: 0, 
+      imageFile: undefined, highFidelityPrototypesImagesFile: undefined, visualDesignsImagesFile: undefined,
       problemStatement: "", targetAudience: "", myRole: "", designThinkingProcess: "", projectTimeline: "",
       qualitativeResearch: "", quantitativeResearch: "", userPersona: "", empathyMap: "", taskFlow: "",
       cardSorting: "", informationArchitecture: "", highFidelityPrototypes: "", typographyAndColors: "",
@@ -81,7 +82,6 @@ function ProjectFormDialog({
             ...baseProject,
             ...project,
             tags: project.tags.join('\n'),
-            imageFile: undefined,
         };
     }
     return baseProject;
@@ -111,7 +111,15 @@ function ProjectFormDialog({
     Object.entries(data).forEach(([key, value]) => {
         if (key === 'imageFile' && value && value[0]) {
             formData.append(key, value[0]);
-        } else if (key !== 'imageFile' && value !== undefined) {
+        } else if (key === 'highFidelityPrototypesImagesFile' && value) {
+            for (let i = 0; i < value.length; i++) {
+              formData.append(key, value[i]);
+            }
+        } else if (key === 'visualDesignsImagesFile' && value) {
+            for (let i = 0; i < value.length; i++) {
+              formData.append(key, value[i]);
+            }
+        } else if (value !== undefined && value !== null) {
             formData.append(key, String(value));
         }
     });
@@ -224,15 +232,49 @@ function ProjectFormDialog({
                <FormField control={form.control} name="informationArchitecture" render={({ field }) => (
                 <FormItem><FormLabel>Information Architecture</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
+
               <FormField control={form.control} name="highFidelityPrototypes" render={({ field }) => (
-                <FormItem><FormLabel>High-Fidelity Prototypes</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>High-Fidelity Prototypes (Text)</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
+              <FormField control={form.control} name="highFidelityPrototypesImagesFile" render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>High-Fidelity Prototypes Images</FormLabel>
+                      {project?.highFidelityPrototypesImages && project.highFidelityPrototypesImages.length > 0 && (
+                          <div className="grid grid-cols-3 gap-2 mb-2 p-2 border rounded-md">
+                              {project.highFidelityPrototypesImages.map((img, i) => (
+                                  <Image key={i} src={img.imageUrl} alt={`Prototype ${i+1}`} width={100} height={100} className="rounded-md object-cover border p-1" />
+                              ))}
+                          </div>
+                      )}
+                      <FormControl><Input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} multiple onChange={(e) => field.onChange(e.target.files)} /></FormControl>
+                      <FormDesc>Upload one or more images for the prototypes collage. Re-uploading will replace all existing images.</FormDesc>
+                      <FormMessage />
+                  </FormItem>
+              )} />
+
               <FormField control={form.control} name="typographyAndColors" render={({ field }) => (
                 <FormItem><FormLabel>Typography & Colors</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
+              
               <FormField control={form.control} name="visualDesigns" render={({ field }) => (
-                <FormItem><FormLabel>Visual Designs</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Visual Designs (Text)</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
+              <FormField control={form.control} name="visualDesignsImagesFile" render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Visual Designs Images</FormLabel>
+                      {project?.visualDesignsImages && project.visualDesignsImages.length > 0 && (
+                          <div className="grid grid-cols-3 gap-2 mb-2 p-2 border rounded-md">
+                              {project.visualDesignsImages.map((img, i) => (
+                                  <Image key={i} src={img.imageUrl} alt={`Visual Design ${i+1}`} width={100} height={100} className="rounded-md object-cover border p-1" />
+                              ))}
+                          </div>
+                      )}
+                      <FormControl><Input type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} multiple onChange={(e) => field.onChange(e.target.files)} /></FormControl>
+                      <FormDesc>Upload one or more images for the visual designs collage. Re-uploading will replace all existing images.</FormDesc>
+                      <FormMessage />
+                  </FormItem>
+              )} />
+
               <FormField control={form.control} name="thankYouNote" render={({ field }) => (
                 <FormItem><FormLabel>Thank You Note</FormLabel><FormControl><Textarea className="min-h-[120px]" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
