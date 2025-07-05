@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -87,6 +88,7 @@ export function Header() {
                      <>
                       <div className="flex items-center gap-2 rounded-md border p-2">
                           <Avatar>
+                              <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User Avatar'} />
                               <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
                           </Avatar>
                           <span className="text-sm font-medium truncate">{user.email}</span>
@@ -127,6 +129,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
+                       <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User Avatar'} />
                        <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
                     </Avatar>
                   </Button>
