@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export async function generateStaticParams() {
     const posts = await getBlogPosts();
@@ -59,7 +61,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
             
             <div className="prose prose-lg dark:prose-invert max-w-none mx-auto">
-                {post.content.split('\n').filter(p => p.trim() !== '').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {post.content}
+                </ReactMarkdown>
             </div>
 
              <div className="mt-16 text-center border-t pt-12">

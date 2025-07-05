@@ -212,7 +212,7 @@ function PostFormDialog({
                           <FormControl>
                             <Textarea className="min-h-[300px]" {...field} />
                           </FormControl>
-                          <FormDesc>The main content of the blog post. Use two newlines for paragraphs.</FormDesc>
+                          <FormDesc>The main content of the blog post. Markdown is supported.</FormDesc>
                           <FormMessage />
                         </FormItem>
                       )}
