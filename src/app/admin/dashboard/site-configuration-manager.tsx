@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 const configSchema = z.object({
   socialLinks: z.object({
@@ -27,7 +28,10 @@ const configSchema = z.object({
       phone: z.string().min(1, "Phone number is required.").or(z.literal('')),
       addressLine1: z.string().min(1, "Address is required.").or(z.literal('')),
       addressLine2: z.string().optional(),
-  })
+  }),
+  privacyPolicy: z.string().optional(),
+  termsOfService: z.string().optional(),
+  cookiePolicy: z.string().optional(),
 });
 
 export function SiteConfigurationManager() {
@@ -41,6 +45,9 @@ export function SiteConfigurationManager() {
       socialLinks: { github: "", twitter: "", linkedin: "" },
       contactInfo: { email: "", phone: "", addressLine1: "", addressLine2: "" },
       calendlyUrl: "",
+      privacyPolicy: "",
+      termsOfService: "",
+      cookiePolicy: "",
     },
   });
 
@@ -172,6 +179,53 @@ export function SiteConfigurationManager() {
                     <FormMessage />
                   </FormItem>
                 )} />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-medium mb-4">Legal Pages Content</h3>
+              <div className="space-y-4 pl-4 border-l-2">
+                <FormField
+                  control={form.control}
+                  name="privacyPolicy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Privacy Policy</FormLabel>
+                      <FormControl>
+                        <Textarea className="min-h-[200px]" placeholder="Enter your full privacy policy text..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="termsOfService"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Terms of Service</FormLabel>
+                      <FormControl>
+                        <Textarea className="min-h-[200px]" placeholder="Enter your full terms of service text..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="cookiePolicy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cookie Policy</FormLabel>
+                      <FormControl>
+                        <Textarea className="min-h-[200px]" placeholder="Enter your full cookie policy text..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
             

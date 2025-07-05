@@ -418,12 +418,15 @@ export async function getSiteConfiguration(): Promise<SiteConfiguration> {
       linkedin: '#',
     },
     contactInfo: {
-      email: 'hello@codezcube.com',
+      email: 'info@codezcube.com',
       phone: '+260 977 123 456',
       addressLine1: 'Lusaka, Zambia',
       addressLine2: '123 Innovation Drive, Woodlands',
     },
     calendlyUrl: 'https://calendly.com/codezcubedecodes/30min',
+    privacyPolicy: 'Your privacy policy content goes here. Please edit this in the admin dashboard.',
+    termsOfService: 'Your terms of service content goes here. Please edit this in the admin dashboard.',
+    cookiePolicy: 'Your cookie policy content goes here. Please edit this in the admin dashboard.',
   };
 
   if (!db) return defaultSiteConfig;
@@ -459,6 +462,9 @@ export async function updateSiteConfiguration(config: SiteConfiguration): Promis
     revalidatePath('/admin/dashboard');
     revalidatePath('/contact');
     revalidatePath('/booking');
+    revalidatePath('/privacy-policy');
+    revalidatePath('/terms-of-service');
+    revalidatePath('/cookie-policy');
     return { success: true, message: 'Site configuration updated successfully.' };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';

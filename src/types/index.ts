@@ -147,6 +147,9 @@ export type SiteConfiguration = {
   socialLinks: SocialLinks;
   contactInfo: ContactInfo;
   calendlyUrl: string;
+  privacyPolicy?: string;
+  termsOfService?: string;
+  cookiePolicy?: string;
 };
 
 export type ContactMessage = {

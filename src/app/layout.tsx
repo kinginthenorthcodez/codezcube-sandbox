@@ -7,6 +7,7 @@ import { Header } from '@/components/common/header';
 import { Footer } from '@/components/common/footer';
 import { AuthProvider } from '@/hooks/use-auth';
 import { AuthProtector } from '@/components/auth-protector';
+import { CookieConsentBanner } from '@/components/cookie-consent-banner';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -47,6 +48,7 @@ export default function RootLayout({
               </div>
             </AuthProtector>
             <Toaster />
+            <CookieConsentBanner />
           </ThemeProvider>
         </AuthProvider>
       </body>
