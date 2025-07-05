@@ -24,6 +24,9 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'CodezCube - Innovation & Technology Solutions',
   description: 'CodezCube is a hybrid innovation company offering web/IT services and a long-term product incubation lab.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
