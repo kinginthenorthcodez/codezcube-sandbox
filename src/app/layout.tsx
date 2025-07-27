@@ -28,9 +28,6 @@ export const metadata: Metadata = {
     template: '%s | CodezCube',
   },
   description: 'CodezCube is a hybrid innovation company offering web/IT services and a long-term product incubation lab.',
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({
