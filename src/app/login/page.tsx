@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useState } from "react";
@@ -38,7 +39,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function LoginPage() {
-  const { signIn, signUp, signInWithGoogle, signInWithGitHub, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithGitHub, user, isProcessingSocialLogin } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [loadingProvider, setLoadingProvider] = useState<null | 'email-signin' | 'email-signup' | 'google' | 'github'>(null);
@@ -107,20 +108,29 @@ export default function LoginPage() {
         } else {
             await signInWithGitHub();
         }
-        router.push("/admin/dashboard");
+        // The user will be redirected, so the page will reload.
+        // We don't need to do anything else here.
     } catch (error: any) {
         toast({
             variant: "destructive",
             title: `Login Failed with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`,
             description: error.message || "An unexpected error occurred. Please try again.",
         });
-    } finally {
         setLoadingProvider(null);
     }
   };
 
-  const isLoading = loadingProvider !== null;
+  const isLoading = loadingProvider !== null || isProcessingSocialLogin;
   
+  if (isProcessingSocialLogin) {
+    return (
+      <div className="flex h-[80vh] w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-4 text-muted-foreground">Finalizing sign-in...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-[80vh] bg-secondary/50">
       <Card className="w-full max-w-sm">
